@@ -1,13 +1,18 @@
 
 # protometry
 
+[![Build Status](https://img.shields.io/circleci/project/The-Tensox/protometry/master.svg)](https://circleci.com/gh/The-Tensox/protometry)
+
 Geometry on protobuf stubs, could be also implemented in other languages.
 
 ## Installation
 
 ```bash
 go get github.com/louis030195/protometry-go
+# Build for gRPC
 protoc -I . --go_out=plugins=grpc:. protometry.proto
+# Without gRPC
+# protoc -I . --go_out=. protometry.proto
 ```
 
 ## Usage
