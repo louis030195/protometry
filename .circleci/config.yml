@@ -4,16 +4,21 @@ jobs: # basic units of work in a run
     docker: # run the steps with Docker
       # CircleCI Go images available at: https://hub.docker.com/r/circleci/golang/
       - image: circleci/golang:1.13
-      - image: grpc/go:1.0
 
     parallelism: 2
 
     environment: # environment variables for the build itself
       TEST_RESULTS: /tmp/test-results # path to where test results will be saved
+      PROTOC_ZIP: protoc-3.11.4-linux-x86_64.zip
     
     steps: # steps that comprise the `build` job
       - checkout # check out source code to working directory
       - run: mkdir -p $TEST_RESULTS # create the test results directory
+      - run: curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v3.11.4/$PROTOC_ZIP
+      - run: sudo unzip -o $PROTOC_ZIP -d /usr/local bin/protoc
+      - run: sudo unzip -o $PROTOC_ZIP -d /usr/local 'include/*'
+      - run: rm -f $PROTOC_ZIP
+      - run: go get -u github.com/golang/protobuf/protoc-gen-go
       - run: protoc -I . --go_out=plugins=grpc:. protometry.proto
 
       - restore_cache: # restores saved cache if no changes are detected since last run
