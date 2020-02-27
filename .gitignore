@@ -13,4 +13,4 @@ build
 *.out
 
 # Protobuf
-*.pb.go
+# *.pb.go
