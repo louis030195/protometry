@@ -21,10 +21,6 @@ jobs: # basic units of work in a run
       - run: go get -u github.com/golang/protobuf/protoc-gen-go
       - run: protoc -I . --go_out=plugins=grpc:. protometry.proto
 
-      - restore_cache: # restores saved cache if no changes are detected since last run
-          keys:
-            - go-mod-v4-{{ checksum "go.sum" }}
-
       - run:
           name: Run unit tests
 
@@ -33,11 +29,6 @@ jobs: # basic units of work in a run
             PACKAGE_NAMES=$(go list ./... | circleci tests split --split-by=timings --timings-type=classname)
             gotestsum --junitfile ${TEST_RESULTS}/gotestsum-report.xml -- $PACKAGE_NAMES
       - run: make # pull and build dependencies for the project
-
-      - save_cache:
-          key: go-mod-v4-{{ checksum "go.sum" }}
-          paths:
-            - "/go/pkg/mod"
 
       - store_test_results: # upload test results for display in Test Summary
           path: /tmp/test-results
