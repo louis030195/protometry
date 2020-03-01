@@ -10,6 +10,7 @@ Geometry on protobuf stubs, could be also implemented in other languages.
 ```bash
 go get github.com/louis030195/protometry-go
 # Build for gRPC
+# If using gRPC go get -u github.com/golang/protobuf/protoc-gen-go
 protoc -I . --go_out=plugins=grpc:. protometry.proto
 # Without gRPC
 # protoc -I . --go_out=. protometry.proto
@@ -36,7 +37,7 @@ a.Inside(*b) // False
 - [x] ToString
 - [x] Normalization
 - [x] Absolute value
-- [x] Add, Sub, Mul(scalar product), Dot(vector product), Div(scalar division), Cross product, Euclidean distance, Angle, Lerp
+- [x] Add, Sub, Mul(scalar product), Dot(vector product), Div(scalar division), Cross product, Euclidean Norm, Angle, Lerp
 - [ ] Encoding
 
 ### Volumes

@@ -46,11 +46,29 @@ func (a *VectorN) ToString() string {
 	return res + "}"
 }
 
-// Norm returns the vector's norm.
-func (a *VectorN) Norm() float64 { return math.Sqrt(a.Dot(*a)) }
+// Pow returns the vector pow
+func (a *VectorN) Pow() *VectorN {
+	var copy []float64
+	for _, d := range a.Dimensions {
+		copy = append(copy, d*d)
+	}
+	return NewVectorN(copy...)
+}
+
+// Sum returns the sum of all the dimensions of the vector
+func (a *VectorN) Sum() float64 {
+	res := 0.
+	for _, d := range a.Dimensions {
+		res += d
+	}
+	return res
+}
+
+// Norm returns the norm.
+func (a *VectorN) Norm() float64 { return a.Pow().Sum() }
 
 // Norm2 returns the square of the norm.
-func (a *VectorN) Norm2() float64 { return a.Dot(*a) }
+func (a *VectorN) Norm2() float64 { return math.Sqrt(a.Norm()) }
 
 // Normalize returns a unit vector in the same direction as a.
 func (a *VectorN) Normalize() *VectorN {
@@ -129,7 +147,7 @@ func (a *VectorN) Cross(b VectorN) (*VectorN, error) {
 }
 
 // Distance returns the Euclidean distance between a and b.
-func (a *VectorN) Distance(b VectorN) float64 { return a.Sub(b).Norm() }
+func (a *VectorN) Distance(b VectorN) float64 { return math.Sqrt(a.Sub(b).Pow().Sum()) }
 
 // Angle returns the angle between a and b.
 func (a *VectorN) Angle(b VectorN) (float64, error) {
@@ -167,6 +185,20 @@ func (a *VectorN) Lerp(b *VectorN, f float64) *VectorN {
 		res = append(res, (b.Dimensions[i]-a.Dimensions[i])*f+a.Dimensions[i])
 	}
 	return NewVectorN(res...)
+}
+
+// In Returns whether the specified point is contained in this box.
+func (a *VectorN) In(box Box) (bool, error) {
+	if len(a.Dimensions) != len(box.min.Dimensions) {
+		return false, ErrVectorInvalidDimension
+	}
+
+	for i := range a.Dimensions {
+		if box.min.Dimensions[i] > a.Dimensions[i] || box.max.Dimensions[i] < a.Dimensions[i] {
+			return false, nil
+		}
+	}
+	return true, nil
 }
 
 // NewQuaternion constructs a VectorN
@@ -229,20 +261,6 @@ func ToQuaternion(yaw, pitch, roll float64) *QuaternionN {
 	sr := math.Sin(roll * 0.5)
 
 	return NewQuaternion(cy*cp*cr+sy*sp*sr, cy*cp*sr-sy*sp*cr, sy*cp*sr+cy*sp*cr, sy*cp*cr-cy*sp*sr)
-}
-
-// In Returns whether the specified point is contained in this box.
-func (a *VectorN) In(box Box) (bool, error) {
-	if len(a.Dimensions) != len(box.min.Dimensions) {
-		return false, ErrVectorInvalidDimension
-	}
-
-	for i := range a.Dimensions {
-		if box.min.Dimensions[i] > a.Dimensions[i] || box.max.Dimensions[i] < a.Dimensions[i] {
-			return false, nil
-		}
-	}
-	return true, nil
 }
 
 // Area is a 3-d interface representing volumes like Boxes, Spheres, Capsules ...
