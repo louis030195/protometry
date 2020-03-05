@@ -11,4 +11,6 @@ var (
 	ErrVectorNotSameSize = errors.New("Vectors are not the same size")
 	// ErrVectorInvalidDimension ...
 	ErrVectorInvalidDimension = errors.New("Vectors' dimensions are not of the expected size")
+	// ErrVectorInvalidIndex ...
+	ErrVectorInvalidIndex = errors.New("Invalid index")
 )
