@@ -28,7 +28,7 @@ func (a *VectorN) ApproxEqual(b VectorN) (bool, error) {
 	const epsilon = 1e-16
 	for i := range a.Dimensions {
 		// If any dimensions aren't aproximately equal, return false
-		if math.Abs(a.Dimensions[i]-b.Dimensions[i]) >= epsilon {
+		if math.Abs(a.Get(i)-b.Get(i)) >= epsilon {
 			return false, nil
 		}
 	}
@@ -37,11 +37,11 @@ func (a *VectorN) ApproxEqual(b VectorN) (bool, error) {
 }
 
 // Get is used to shorten access to dimensions
-func (a *VectorN) Get(dimension int) (float64, error) {
+func (a *VectorN) Get(dimension int) float64 {
 	if dimension < 0 || dimension > len(a.Dimensions)-1 {
-		return 0, ErrVectorInvalidIndex
+		return math.MaxFloat64
 	}
-	return a.Dimensions[dimension], nil
+	return a.Dimensions[dimension]
 }
 
 // Set is used to shorten dimensions assignment
@@ -108,7 +108,7 @@ func (a *VectorN) Abs() *VectorN {
 func (a *VectorN) Add(b VectorN) *VectorN {
 	var res []float64
 	for i := range a.Dimensions {
-		res = append(res, a.Dimensions[i]+b.Dimensions[i])
+		res = append(res, a.Get(i)+b.Get(i))
 	}
 	return NewVectorN(res...)
 }
@@ -117,7 +117,7 @@ func (a *VectorN) Add(b VectorN) *VectorN {
 func (a *VectorN) Sub(b VectorN) *VectorN {
 	var res []float64
 	for i := range a.Dimensions {
-		res = append(res, a.Dimensions[i]-b.Dimensions[i])
+		res = append(res, a.Get(i)-b.Get(i))
 	}
 	return NewVectorN(res...)
 }
@@ -145,7 +145,7 @@ func (a *VectorN) Div(m float64) (*VectorN, error) {
 func (a *VectorN) Dot(b VectorN) float64 {
 	res := .0
 	for i := range a.Dimensions {
-		res += (a.Dimensions[i] * b.Dimensions[i])
+		res += (a.Get(i) * b.Get(i))
 	}
 	return res
 }
@@ -156,9 +156,9 @@ func (a *VectorN) Cross(b VectorN) (*VectorN, error) {
 	if len(a.Dimensions) != 3 || len(b.Dimensions) != 3 {
 		return nil, ErrVectorInvalidDimension
 	}
-	res := []float64{a.Dimensions[1]*b.Dimensions[2] - a.Dimensions[2]*b.Dimensions[1],
-		a.Dimensions[2]*b.Dimensions[0] - a.Dimensions[0]*b.Dimensions[2],
-		a.Dimensions[0]*b.Dimensions[1] - a.Dimensions[1]*b.Dimensions[0]}
+	res := []float64{a.Get(1)*b.Get(2) - a.Get(2)*b.Get(1),
+		a.Get(2)*b.Get(0) - a.Get(0)*b.Get(2),
+		a.Get(0)*b.Get(1) - a.Get(1)*b.Get(0)}
 	return NewVectorN(res...), nil
 }
 
@@ -179,7 +179,7 @@ func (a *VectorN) Angle(b VectorN) (float64, error) {
 func Min(a VectorN, b VectorN) VectorN {
 	var res []float64
 	for i := range a.Dimensions {
-		res = append(res, math.Min(a.Dimensions[i], b.Dimensions[i]))
+		res = append(res, math.Min(a.Get(i), b.Get(i)))
 	}
 	return *NewVectorN(res...)
 }
@@ -189,7 +189,7 @@ func Min(a VectorN, b VectorN) VectorN {
 func Max(a VectorN, b VectorN) VectorN {
 	var res []float64
 	for i := range a.Dimensions {
-		res = append(res, math.Max(a.Dimensions[i], b.Dimensions[i]))
+		res = append(res, math.Max(a.Get(i), b.Get(i)))
 	}
 	return *NewVectorN(res...)
 }
@@ -198,7 +198,7 @@ func Max(a VectorN, b VectorN) VectorN {
 func (a *VectorN) Lerp(b *VectorN, f float64) *VectorN {
 	var res []float64
 	for i := range a.Dimensions {
-		res = append(res, (b.Dimensions[i]-a.Dimensions[i])*f+a.Dimensions[i])
+		res = append(res, (b.Get(i)-a.Get(i))*f+a.Get(i))
 	}
 	return NewVectorN(res...)
 }
@@ -219,9 +219,9 @@ func Morton3D(v VectorN) (uint, error) { // TODO: decoder
 	if len(v.Dimensions) != 3 {
 		return 0, ErrVectorInvalidDimension
 	}
-	x := math.Min(math.Max(v.Dimensions[0]*1024.0, 0.0), 1023.0)
-	y := math.Min(math.Max(v.Dimensions[1]*1024.0, 0.0), 1023.0)
-	z := math.Min(math.Max(v.Dimensions[2]*1024.0, 0.0), 1023.0)
+	x := math.Min(math.Max(v.Get(0)*1024.0, 0.0), 1023.0)
+	y := math.Min(math.Max(v.Get(1)*1024.0, 0.0), 1023.0)
+	z := math.Min(math.Max(v.Get(2)*1024.0, 0.0), 1023.0)
 	xx := expandBits(uint(x))
 	yy := expandBits(uint(y))
 	zz := expandBits(uint(z))

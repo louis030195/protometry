@@ -1,6 +1,7 @@
 package protometry
 
 import (
+	"fmt"
 	"log"
 	"math"
 )
@@ -12,7 +13,7 @@ func (a *VectorN) In(box Box) (bool, error) {
 	}
 
 	for i := range a.Dimensions {
-		if box.min.Dimensions[i] > a.Dimensions[i] || box.max.Dimensions[i] < a.Dimensions[i] {
+		if box.min.Get(i) > a.Get(i) || box.max.Get(i) < a.Get(i) {
 			return false, nil
 		}
 	}
@@ -58,10 +59,10 @@ func (b *Box) GetSize() float64 {
 }
 
 // NewBox constructs and returns a new box
-func NewBox(min, max VectorN) *Box {
+func NewBox(minX, minY, minZ, maxX, maxY, maxZ float64) *Box {
 	return &Box{
-		min: Min(min, max),
-		max: Max(min, max),
+		min: Min(*NewVectorN(minX, minY, minZ), *NewVectorN(maxX, maxY, maxZ)),
+		max: Max(*NewVectorN(minX, minY, minZ), *NewVectorN(maxX, maxY, maxZ)),
 	}
 }
 
@@ -91,7 +92,7 @@ func (b *Box) Intersects(o Box) (bool, error) {
 		return false, ErrVectorInvalidDimension
 	}
 	for i := range b.min.Dimensions {
-		if b.max.Dimensions[i] < o.min.Dimensions[i] || o.max.Dimensions[i] < b.min.Dimensions[i] {
+		if b.max.Get(i) < o.min.Get(i) || o.max.Get(i) < b.min.Get(i) {
 			return false, nil
 		}
 	}
@@ -99,28 +100,28 @@ func (b *Box) Intersects(o Box) (bool, error) {
 }
 
 // MakeSubBoxes split a box into subAreas
-// TODO: not sure if it's correct
-func (b *Box) MakeSubBoxes() []*Box {
+// TODO: not sure if it's correct, MAKE TEST
+func (b *Box) MakeSubBoxes() [8]*Box {
 	// gets the child boxes (octants) of the box.
 	center := b.min.Lerp(&b.max, 0.5)
 
-	return []*Box{
-		NewBox(*NewVectorN(b.max.Dimensions[0], b.max.Dimensions[1], b.max.Dimensions[2]),
-			*NewVectorN(center.Dimensions[0:3]...)),
-		NewBox(*NewVectorN(center.Dimensions[0]+1, b.max.Dimensions[1], b.max.Dimensions[2]),
-			*NewVectorN(b.min.Dimensions[0], center.Dimensions[1], center.Dimensions[2])),
-		NewBox(*NewVectorN(center.Dimensions[0]+1, center.Dimensions[1]+1, b.max.Dimensions[2]),
-			*NewVectorN(b.min.Dimensions[0], b.min.Dimensions[1], center.Dimensions[2])),
-		NewBox(*NewVectorN(b.max.Dimensions[0], center.Dimensions[1]+1, b.max.Dimensions[2]),
-			*NewVectorN(center.Dimensions[0], b.min.Dimensions[1], center.Dimensions[2])),
-		NewBox(*NewVectorN(b.max.Dimensions[0], b.max.Dimensions[1], center.Dimensions[2]+1),
-			*NewVectorN(center.Dimensions[0], center.Dimensions[1], b.min.Dimensions[2])),
-		NewBox(*NewVectorN(center.Dimensions[0]+1, b.max.Dimensions[1], center.Dimensions[2]+1),
-			*NewVectorN(b.min.Dimensions[0], center.Dimensions[1], b.min.Dimensions[2])),
-		NewBox(*NewVectorN(center.Dimensions[0]+1, center.Dimensions[1]+1, center.Dimensions[2]+1),
-			*NewVectorN(b.min.Dimensions[0], b.min.Dimensions[1], b.min.Dimensions[2])),
-		NewBox(*NewVectorN(b.max.Dimensions[0], center.Dimensions[1]+1, center.Dimensions[2]+1),
-			*NewVectorN(center.Dimensions[0], b.min.Dimensions[1], b.min.Dimensions[2])),
+	return [8]*Box{
+		NewBox(b.max.Get(0), b.max.Get(1), b.max.Get(2),
+			center.Get(0), center.Get(1), center.Get(2)),
+		NewBox(center.Get(0), b.max.Get(1), b.max.Get(2),
+			b.min.Get(0), center.Get(1), center.Get(2)),
+		NewBox(center.Get(0), center.Get(1), b.max.Get(2),
+			b.min.Get(0), b.min.Get(1), center.Get(2)),
+		NewBox(b.max.Get(0), center.Get(1), b.max.Get(2),
+			center.Get(0), b.min.Get(1), center.Get(2)),
+		NewBox(b.max.Get(0), b.max.Get(1), center.Get(2),
+			center.Get(0), center.Get(1), b.min.Get(2)),
+		NewBox(center.Get(0), b.max.Get(1), center.Get(2),
+			b.min.Get(0), center.Get(1), b.min.Get(2)),
+		NewBox(center.Get(0), center.Get(1), center.Get(2),
+			b.min.Get(0), b.min.Get(1), b.min.Get(2)),
+		NewBox(b.max.Get(0), center.Get(1), center.Get(2),
+			center.Get(0), b.min.Get(1), b.min.Get(2)),
 	}
 }
 
@@ -133,10 +134,10 @@ func (b *Box) GetCenter() *VectorN {
 func MinimumTranslation(a, b Box) VectorN {
 	mtd := VectorN{}
 
-	left := b.min.Dimensions[0] - a.max.Dimensions[0]
-	right := b.max.Dimensions[0] - a.min.Dimensions[0]
-	top := b.min.Dimensions[1] - a.max.Dimensions[1]
-	bottom := b.max.Dimensions[1] - a.min.Dimensions[1]
+	left := b.min.Get(0) - a.max.Get(0)
+	right := b.max.Get(0) - a.min.Get(0)
+	top := b.min.Get(1) - a.max.Get(1)
+	bottom := b.max.Get(1) - a.min.Get(1)
 
 	if left > 0 || right < 0 {
 		log.Println("Box aint intercepting")
@@ -150,22 +151,27 @@ func MinimumTranslation(a, b Box) VectorN {
 		//box doesn't intercept
 	}
 	if math.Abs(left) < right {
-		mtd.Dimensions[0] = left
+		mtd.Set(0, left)
 	} else {
-		mtd.Dimensions[0] = right
+		mtd.Set(0, right)
 	}
 
 	if math.Abs(top) < bottom {
-		mtd.Dimensions[1] = top
+		mtd.Set(1, top)
 	} else {
-		mtd.Dimensions[1] = bottom
+		mtd.Set(1, bottom)
 	}
 
-	if math.Abs(mtd.Dimensions[0]) < math.Abs(mtd.Dimensions[1]) {
-		mtd.Dimensions[1] = 0
+	if math.Abs(mtd.Get(0)) < math.Abs(mtd.Get(1)) {
+		mtd.Set(1, 0)
 	} else {
-		mtd.Dimensions[0] = 0
+		mtd.Set(0, 0)
 	}
 
 	return mtd
+}
+
+// ToString returns a human-readable representation of the box
+func (b *Box) ToString() string {
+	return fmt.Sprintf("min: %v, max: %v", b.min.ToString(), b.max.ToString())
 }

@@ -1,6 +1,7 @@
 package protometry
 
 import (
+	"math"
 	"reflect"
 	"testing"
 )
@@ -200,35 +201,30 @@ func TestVectorN_Get(t *testing.T) {
 		dimension int
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		args    args
-		want    float64
-		wantErr bool
+		name   string
+		fields fields
+		args   args
+		want   float64
 	}{
 		{
-			fields:  fields{Dimensions: []float64{0.2, 11, 12}},
-			args:    args{dimension: 0},
-			want:    0.2,
-			wantErr: false,
+			fields: fields{Dimensions: []float64{0.2, 11, 12}},
+			args:   args{dimension: 0},
+			want:   0.2,
 		},
 		{
-			fields:  fields{Dimensions: []float64{0.2, 11, 12}},
-			args:    args{dimension: -1},
-			want:    0,
-			wantErr: true,
+			fields: fields{Dimensions: []float64{0.2, 11, 12}},
+			args:   args{dimension: -1},
+			want:   math.MaxFloat64,
 		},
 		{
-			fields:  fields{Dimensions: []float64{0.2, 11, 12}},
-			args:    args{dimension: 2},
-			want:    12,
-			wantErr: false,
+			fields: fields{Dimensions: []float64{0.2, 11, 12}},
+			args:   args{dimension: 2},
+			want:   12,
 		},
 		{
-			fields:  fields{Dimensions: []float64{0.2, 11, 12}},
-			args:    args{dimension: 3},
-			want:    0,
-			wantErr: true,
+			fields: fields{Dimensions: []float64{0.2, 11, 12}},
+			args:   args{dimension: 3},
+			want:   math.MaxFloat64,
 		},
 	}
 	for _, tt := range tests {
@@ -239,11 +235,7 @@ func TestVectorN_Get(t *testing.T) {
 				XXX_unrecognized:     tt.fields.XXX_unrecognized,
 				XXX_sizecache:        tt.fields.XXX_sizecache,
 			}
-			got, err := a.Get(tt.args.dimension)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("VectorN.Get() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got := a.Get(tt.args.dimension)
 			if got != tt.want {
 				t.Errorf("VectorN.Get() = %v, want %v", got, tt.want)
 			}

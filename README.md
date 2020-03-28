@@ -19,6 +19,10 @@ protoc -I . --go_out=plugins=grpc:. protometry.proto
 ## Usage
 
 ```go
+vector := NewVector3One() // 1,1,1
+log.Printf("My vector: %s", vector.Get(1)) // 1
+vector.Set(0, 12.6422)
+
 v := NewVectorN(0, 0, 0)
 v.Mul(3.5) // 0,0,0
 v.Add(v) // 0,0,0

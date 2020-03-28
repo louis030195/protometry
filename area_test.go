@@ -1,12 +1,13 @@
 package protometry
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
 
 func TestVectorN_In(t *testing.T) {
-	a := NewBox(*NewVectorN(0, 0, 0), *NewVectorN(1, 1, 1))
+	a := NewBox(0, 0, 0, 1, 1, 1)
 	in, err := NewVectorN(1, 1, 1).In(*a)
 	Equals(t, nil, err)
 	if err == nil {
@@ -62,8 +63,8 @@ func TestVectorN_In(t *testing.T) {
 }
 
 func TestBox_Inside(t *testing.T) {
-	a := NewBox(*NewVectorN(0, 0, 0), *NewVectorN(1, 1, 1))
-	b := NewBox(*NewVectorN(0, 0, 0), *NewVectorN(1, 1, 1))
+	a := NewBox(0, 0, 0, 1, 1, 1)
+	b := NewBox(0, 0, 0, 1, 1, 1)
 
 	// contains equal Box, symmetrically
 	if inside, err := a.Inside(*b); err == nil {
@@ -78,7 +79,7 @@ func TestBox_Inside(t *testing.T) {
 	}
 
 	// contained on edge
-	b = NewBox(*NewVectorN(0, 0, 0), *NewVectorN(0.5, 1, 1))
+	b = NewBox(0, 0, 0, 0.5, 1, 1)
 
 	if inside, err := b.Inside(*a); err == nil {
 		Equals(t, true, inside)
@@ -92,7 +93,7 @@ func TestBox_Inside(t *testing.T) {
 	}
 
 	// contained away from edges
-	b = NewBox(*NewVectorN(0.1, 0.1, 0.1), *NewVectorN(0.9, 0.9, 0.9))
+	b = NewBox(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
 	if inside, err := b.Inside(*a); err == nil {
 		Equals(t, true, inside)
 	} else {
@@ -105,7 +106,7 @@ func TestBox_Inside(t *testing.T) {
 	}
 
 	// 1 corner inside
-	b = NewBox(*NewVectorN(-0.1, -0.1, -0.1), *NewVectorN(0.9, 0.9, 0.9))
+	b = NewBox(-0.1, -0.1, -0.1, 0.9, 0.9, 0.9)
 	if inside, err := b.Inside(*a); err == nil {
 		Equals(t, false, inside)
 	} else {
@@ -117,7 +118,7 @@ func TestBox_Inside(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	b = NewBox(*NewVectorN(0.9, 0.9, 0.9), *NewVectorN(1.1, 1.1, 1.1))
+	b = NewBox(0.9, 0.9, 0.9, 1.1, 1.1, 1.1)
 	if inside, err := b.Inside(*a); err == nil {
 		Equals(t, false, inside)
 	} else {
@@ -131,8 +132,8 @@ func TestBox_Inside(t *testing.T) {
 }
 
 func TestBox_Intersects(t *testing.T) {
-	a := NewBox(*NewVectorN(0, 0, 0), *NewVectorN(1, 1, 1))
-	b := NewBox(*NewVectorN(1.1, 0, 0), *NewVectorN(2, 1, 1))
+	a := NewBox(0, 0, 0, 1, 1, 1)
+	b := NewBox(1.1, 0, 0, 2, 1, 1)
 
 	// not intersecting area above or below in each dimension
 	if intersects, err := a.Intersects(*b); err == nil {
@@ -140,31 +141,31 @@ func TestBox_Intersects(t *testing.T) {
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(-1, 0, 0), *NewVectorN(-0.1, 1, 1))
+	b = NewBox(-1, 0, 0, -0.1, 1, 1)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, false, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(0, 1.1, 0), *NewVectorN(1, 2, 1))
+	b = NewBox(0, 1.1, 0, 1, 2, 1)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, false, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(0, -1, 0), *NewVectorN(1, -0.1, 1))
+	b = NewBox(0, -1, 0, 1, -0.1, 1)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, false, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(0, 0, 1.1), *NewVectorN(1, 1, 2))
+	b = NewBox(0, 0, 1.1, 1, 1, 2)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, false, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(0, 0, -1), *NewVectorN(1, 1, -0.1))
+	b = NewBox(0, 0, -1, 1, 1, -0.1)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, false, intersects)
 	} else {
@@ -172,7 +173,7 @@ func TestBox_Intersects(t *testing.T) {
 	}
 
 	// intersects equal Box, symmetrically
-	b = NewBox(*NewVectorN(0, 0, 0), *NewVectorN(1, 1, 1))
+	b = NewBox(0, 0, 0, 1, 1, 1)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
@@ -180,7 +181,7 @@ func TestBox_Intersects(t *testing.T) {
 	}
 
 	// intersects containing and contained
-	b = NewBox(*NewVectorN(0.1, 0.1, 0.1), *NewVectorN(0.9, 0.9, 0.9))
+	b = NewBox(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
@@ -188,49 +189,49 @@ func TestBox_Intersects(t *testing.T) {
 	}
 
 	// intersects partial containment on each corner
-	b = NewBox(*NewVectorN(0.9, 0.9, 0.9), *NewVectorN(2, 2, 2))
+	b = NewBox(0.9, 0.9, 0.9, 2, 2, 2)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(-1, 0.9, 0.9), *NewVectorN(1, 2, 2))
+	b = NewBox(-1, 0.9, 0.9, 1, 2, 2)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(0.9, -1, 0.9), *NewVectorN(2, 0.1, 2))
+	b = NewBox(0.9, -1, 0.9, 2, 0.1, 2)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(-1, -1, 0.9), *NewVectorN(0.1, 0.1, 2))
+	b = NewBox(-1, -1, 0.9, 0.1, 0.1, 2)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(0.9, 0.9, -1), *NewVectorN(2, 2, 0.1))
+	b = NewBox(0.9, 0.9, -1, 2, 2, 0.1)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(-1, 0.9, -1), *NewVectorN(0.1, 2, 0.1))
+	b = NewBox(-1, 0.9, -1, 0.1, 2, 0.1)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(0.9, -1, -1), *NewVectorN(2, 0.1, 0.1))
+	b = NewBox(0.9, -1, -1, 2, 0.1, 0.1)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(-1, -1, -1), *NewVectorN(0.1, 0.1, 0.1))
+	b = NewBox(-1, -1, -1, 0.1, 0.1, 0.1)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
@@ -239,19 +240,19 @@ func TestBox_Intersects(t *testing.T) {
 
 	// intersects 'beam'; where no corners inside
 	// other but some contained
-	b = NewBox(*NewVectorN(-1, 0.1, 0.1), *NewVectorN(2, 0.9, 0.9))
+	b = NewBox(-1, 0.1, 0.1, 2, 0.9, 0.9)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(0.1, -1, 0.1), *NewVectorN(0.9, 2, 0.9))
+	b = NewBox(0.1, -1, 0.1, 0.9, 2, 0.9)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
 		t.Fatal(err)
 	}
-	b = NewBox(*NewVectorN(0.1, 0.1, -1), *NewVectorN(0.9, 0.9, 2))
+	b = NewBox(0.1, 0.1, -1, 0.9, 0.9, 2)
 	if intersects, err := a.Intersects(*b); err == nil {
 		Equals(t, true, intersects)
 	} else {
@@ -274,7 +275,7 @@ func TestNewBoxOfSize(t *testing.T) {
 				*NewVectorN(0, 0, 0),
 				50.,
 			},
-			want: NewBox(*NewVectorN(-50, -50, -50), *NewVectorN(50, 50, 50)),
+			want: NewBox(-50, -50, -50, 50, 50, 50),
 		},
 	}
 	for _, tt := range tests {
@@ -314,6 +315,64 @@ func TestBox_GetSize(t *testing.T) {
 			}
 			if got := b.GetSize(); got != tt.want {
 				t.Errorf("Box.GetSize() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestBox_MakeSubBoxes(t *testing.T) {
+	type fields struct {
+		min VectorN
+		max VectorN
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   [8]*Box
+	}{
+		// TODO: Add test cases.
+		{
+			fields: fields{min: *NewVector3Zero(), max: *NewVectorN(1, 1, 1)},
+			want: [8]*Box{
+				NewBox(0.5, 0.5, 0.5, 1, 1, 1),
+				NewBox(0, 0.5, 0.5, 0.5, 1, 1),
+				NewBox(0, 0, 0.5, 0.5, 0.5, 1),
+				NewBox(0.5, 0, 0.5, 1, 0.5, 1),
+				NewBox(0.5, 0.5, 0, 1, 1, 0.5),
+				NewBox(0, 0.5, 0, 0.5, 1, 0.5),
+				NewBox(0, 0, 0, 0.5, 0.5, 0.5),
+				NewBox(0.5, 0, 0, 1, 0.5, 0.5),
+			},
+		},
+		{
+			fields: fields{min: *NewVectorN(-5, -5, -5), max: *NewVectorN(5, 5, 5)},
+			want: [8]*Box{
+				NewBox(0, 0, 0, 5, 5, 5),
+				NewBox(-5, 0, 0, 0, 5, 5),
+				NewBox(-5, -5, 0, 0, 0, 5),
+				NewBox(0, -5, 0, 5, 0, 5),
+				NewBox(0, 0, -5, 5, 5, 0),
+				NewBox(-5, 0, -5, 0, 5, 0),
+				NewBox(-5, -5, -5, 0, 0, 0),
+				NewBox(0, -5, -5, 5, 0, 0),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &Box{
+				min: tt.fields.min,
+				max: tt.fields.max,
+			}
+			if got := b.MakeSubBoxes(); !reflect.DeepEqual(got, tt.want) {
+				sbToString := func(sb [8]*Box) string {
+					subBoxesString := ""
+					for _, b := range got {
+						subBoxesString += fmt.Sprintf("%v\n", b.ToString())
+					}
+					return subBoxesString
+				}
+				t.Errorf("Box.MakeSubBoxes() = \n%v, \nwant \n%v", sbToString(got), sbToString(tt.want))
 			}
 		})
 	}

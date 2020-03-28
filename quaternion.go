@@ -36,19 +36,19 @@ func LookAtTwo(from, to VectorN) ([][]float64, error) {
 		a[i] = make([]float64, 3)
 	}
 
-	a[0][0] = right.Dimensions[0]
-	a[0][1] = right.Dimensions[1]
-	a[0][2] = right.Dimensions[2]
-	a[1][0] = up.Dimensions[0]
-	a[1][1] = up.Dimensions[1]
-	a[1][2] = up.Dimensions[2]
-	a[2][0] = forward.Dimensions[0]
-	a[2][1] = forward.Dimensions[1]
-	a[2][2] = forward.Dimensions[2]
+	a[0][0] = right.Get(0)
+	a[0][1] = right.Get(1)
+	a[0][2] = right.Get(2)
+	a[1][0] = up.Get(0)
+	a[1][1] = up.Get(1)
+	a[1][2] = up.Get(2)
+	a[2][0] = forward.Get(0)
+	a[2][1] = forward.Get(1)
+	a[2][2] = forward.Get(2)
 
-	a[3][0] = from.Dimensions[0]
-	a[3][1] = from.Dimensions[1]
-	a[3][2] = from.Dimensions[2]
+	a[3][0] = from.Get(0)
+	a[3][1] = from.Get(1)
+	a[3][2] = from.Get(2)
 
 	return a, nil
 }
