@@ -1,6 +1,7 @@
 
 # protometry
 
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/52ed0a7a050c470ababeb6e888d51878)](https://app.codacy.com/gh/The-Tensox/protometry?utm_source=github.com&utm_medium=referral&utm_content=The-Tensox/protometry&utm_campaign=Badge_Grade_Dashboard)
 [![Build Status](https://img.shields.io/circleci/project/The-Tensox/protometry/master.svg)](https://circleci.com/gh/The-Tensox/protometry)
 
 Geometry on protobuf stubs, could be also implemented in other languages.
