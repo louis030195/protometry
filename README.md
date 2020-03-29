@@ -9,12 +9,12 @@ Geometry on protobuf stubs, could be also implemented in other languages.
 ## Installation
 
 ```bash
-go get github.com/louis030195/protometry-go
+go get github.com/louis030195/protometry
 # Build for gRPC
 # If using gRPC go get -u github.com/golang/protobuf/protoc-gen-go
-protoc -I . --go_out=plugins=grpc:. protometry.proto
+protoc -I . --go_out=plugins=grpc:. *.proto
 # Without gRPC
-# protoc -I . --go_out=. protometry.proto
+# protoc -I . --go_out=. *.proto
 ```
 
 ## Usage
@@ -30,7 +30,7 @@ v.Add(v) // 0,0,0
 
 a := NewBox(*NewVectorN(0, 0, 0), *NewVectorN(1, 1, 1))
 b := NewBoxOfSize(*NewVectorN(2, 2, 2), 0.5)
-a.Inside(*b) // False
+a.Fit(*b) // False
 ```
 
 ## Features
@@ -47,7 +47,7 @@ a.Inside(*b) // False
 
 ### Volumes
 
-- [x] Box Intersections, Inside
+- [x] Box Intersections, Fit
 - [ ] Other volumes (sphere, capsule, Convex ...)
 
 ## Test

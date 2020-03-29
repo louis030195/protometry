@@ -19,7 +19,7 @@ jobs: # basic units of work in a run
       - run: sudo unzip -o $PROTOC_ZIP -d /usr/local 'include/*'
       - run: rm -f $PROTOC_ZIP
       - run: go get -u github.com/golang/protobuf/protoc-gen-go
-      - run: protoc -I . --go_out=plugins=grpc:. protometry.proto
+      - run: protoc -I . --go_out=plugins=grpc:. *.proto
 
       - run:
           name: Run unit tests

@@ -62,18 +62,18 @@ func TestVectorN_In(t *testing.T) {
 	}
 }
 
-func TestBox_Inside(t *testing.T) {
+func TestBox_Fit(t *testing.T) {
 	a := NewBox(0, 0, 0, 1, 1, 1)
 	b := NewBox(0, 0, 0, 1, 1, 1)
 
 	// contains equal Box, symmetrically
-	if inside, err := a.Inside(*b); err == nil {
-		Equals(t, true, inside)
+	if Fit, err := a.Fit(*b); err == nil {
+		Equals(t, true, Fit)
 	} else {
 		t.Fatal(err)
 	}
-	if inside, err := a.Inside(*b); err == nil {
-		Equals(t, true, inside)
+	if Fit, err := a.Fit(*b); err == nil {
+		Equals(t, true, Fit)
 	} else {
 		t.Fatal(err)
 	}
@@ -81,51 +81,51 @@ func TestBox_Inside(t *testing.T) {
 	// contained on edge
 	b = NewBox(0, 0, 0, 0.5, 1, 1)
 
-	if inside, err := b.Inside(*a); err == nil {
-		Equals(t, true, inside)
+	if Fit, err := b.Fit(*a); err == nil {
+		Equals(t, true, Fit)
 	} else {
 		t.Fatal(err)
 	}
-	if inside, err := a.Inside(*b); err == nil {
-		Equals(t, false, inside)
+	if Fit, err := a.Fit(*b); err == nil {
+		Equals(t, false, Fit)
 	} else {
 		t.Fatal(err)
 	}
 
 	// contained away from edges
 	b = NewBox(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
-	if inside, err := b.Inside(*a); err == nil {
-		Equals(t, true, inside)
+	if Fit, err := b.Fit(*a); err == nil {
+		Equals(t, true, Fit)
 	} else {
 		t.Fatal(err)
 	}
-	if inside, err := a.Inside(*b); err == nil {
-		Equals(t, false, inside)
+	if Fit, err := a.Fit(*b); err == nil {
+		Equals(t, false, Fit)
 	} else {
 		t.Fatal(err)
 	}
 
-	// 1 corner inside
+	// 1 corner Fit
 	b = NewBox(-0.1, -0.1, -0.1, 0.9, 0.9, 0.9)
-	if inside, err := b.Inside(*a); err == nil {
-		Equals(t, false, inside)
+	if Fit, err := b.Fit(*a); err == nil {
+		Equals(t, false, Fit)
 	} else {
 		t.Fatal(err)
 	}
-	if inside, err := a.Inside(*b); err == nil {
-		Equals(t, false, inside)
+	if Fit, err := a.Fit(*b); err == nil {
+		Equals(t, false, Fit)
 	} else {
 		t.Fatal(err)
 	}
 
 	b = NewBox(0.9, 0.9, 0.9, 1.1, 1.1, 1.1)
-	if inside, err := b.Inside(*a); err == nil {
-		Equals(t, false, inside)
+	if Fit, err := b.Fit(*a); err == nil {
+		Equals(t, false, Fit)
 	} else {
 		t.Fatal(err)
 	}
-	if inside, err := a.Inside(*b); err == nil {
-		Equals(t, false, inside)
+	if Fit, err := a.Fit(*b); err == nil {
+		Equals(t, false, Fit)
 	} else {
 		t.Fatal(err)
 	}
@@ -238,7 +238,7 @@ func TestBox_Intersects(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// intersects 'beam'; where no corners inside
+	// intersects 'beam'; where no corners Fit
 	// other but some contained
 	b = NewBox(-1, 0.1, 0.1, 2, 0.9, 0.9)
 	if intersects, err := a.Intersects(*b); err == nil {

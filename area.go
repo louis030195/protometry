@@ -22,7 +22,7 @@ func (a *VectorN) In(box Box) (bool, error) {
 
 // Area is a 3-d interface representing volumes like Boxes, Spheres, Capsules ...
 type Area interface {
-	Inside(Area) (bool, error)
+	Fit(Area) (bool, error)
 	Intersects(Area) (bool, error)
 }
 
@@ -59,10 +59,13 @@ func (b *Box) GetSize() float64 {
 }
 
 // NewBox constructs and returns a new box
-func NewBox(minX, minY, minZ, maxX, maxY, maxZ float64) *Box {
+func NewBox(dims ...float64) *Box {
+	if len(dims) != 6 {
+		return nil
+	}
 	return &Box{
-		min: Min(*NewVectorN(minX, minY, minZ), *NewVectorN(maxX, maxY, maxZ)),
-		max: Max(*NewVectorN(minX, minY, minZ), *NewVectorN(maxX, maxY, maxZ)),
+		min: Min(*NewVectorN(dims[0:3]...), *NewVectorN(dims[3:6]...)),
+		max: Max(*NewVectorN(dims[0:3]...), *NewVectorN(dims[3:6]...)),
 	}
 }
 
@@ -73,8 +76,8 @@ func NewBoxOfSize(position VectorN, size float64) *Box {
 	}
 }
 
-// Inside Returns whether the specified area is fully contained in the other area.
-func (b *Box) Inside(o Box) (bool, error) {
+// Fit Returns whether the specified area is fully contained in the other area.
+func (b *Box) Fit(o Box) (bool, error) {
 	minIn, errMin := b.min.In(o)
 	if errMin != nil {
 		return false, errMin
