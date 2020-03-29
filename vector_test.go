@@ -165,24 +165,18 @@ func TestMorton3D(t *testing.T) {
 		v VectorN
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    uint
-		wantErr bool
+		name string
+		args args
+		want uint
 	}{
 		{
-			args:    args{v: *NewVectorN(12.0, 15.1, 1.786)},
-			want:    1073741823,
-			wantErr: false,
+			args: args{v: *NewVectorN(12.0, 15.1, 1.786)},
+			want: 1073741823,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Morton3D(tt.args.v)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Morton3D() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got := Morton3D(tt.args.v)
 			if got != tt.want {
 				t.Errorf("Morton3D() = %v, want %v", got, tt.want)
 			}

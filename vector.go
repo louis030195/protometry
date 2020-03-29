@@ -20,20 +20,20 @@ func NewVector3One() *VectorN {
 	return &VectorN{Dimensions: []float64{1, 1, 1}}
 }
 
-// ApproxEqual reports whether a and b are equal within a small epsilon.
-func (a *VectorN) ApproxEqual(b VectorN) (bool, error) {
+// Equal reports whether a and b are equal within a small epsilon.
+func (a *VectorN) Equal(b VectorN) bool {
 	if len(a.Dimensions) != len(b.Dimensions) {
-		return false, ErrVectorInvalidDimension
+		return false
 	}
 	const epsilon = 1e-16
 	for i := range a.Dimensions {
 		// If any dimensions aren't aproximately equal, return false
 		if math.Abs(a.Get(i)-b.Get(i)) >= epsilon {
-			return false, nil
+			return false
 		}
 	}
 	// Else return true
-	return true, nil
+	return true
 }
 
 // Get is used to shorten access to dimensions
@@ -131,14 +131,14 @@ func (a *VectorN) Mul(m float64) *VectorN {
 }
 
 // Div returns the standard scalar division of a and m.
-func (a *VectorN) Div(m float64) (*VectorN, error) {
+func (a *VectorN) Div(m float64) *VectorN {
 	if m == 0 {
-		return nil, ErrDivisionByZero
+		return nil
 	}
 	for i := range a.Dimensions {
 		a.Dimensions[i] /= m
 	}
-	return a, nil
+	return a
 }
 
 // Dot returns the standard dot product of a and b.
@@ -151,27 +151,27 @@ func (a *VectorN) Dot(b VectorN) float64 {
 }
 
 // Cross returns the standard cross product of a and b.
-func (a *VectorN) Cross(b VectorN) (*VectorN, error) {
+func (a *VectorN) Cross(b VectorN) *VectorN {
 	// Early error check to prevent redundant cloning
 	if len(a.Dimensions) != 3 || len(b.Dimensions) != 3 {
-		return nil, ErrVectorInvalidDimension
+		return nil
 	}
 	res := []float64{a.Get(1)*b.Get(2) - a.Get(2)*b.Get(1),
 		a.Get(2)*b.Get(0) - a.Get(0)*b.Get(2),
 		a.Get(0)*b.Get(1) - a.Get(1)*b.Get(0)}
-	return NewVectorN(res...), nil
+	return NewVectorN(res...)
 }
 
 // Distance returns the Euclidean distance between a and b.
 func (a *VectorN) Distance(b VectorN) float64 { return math.Sqrt(a.Sub(b).Pow().Sum()) }
 
 // Angle returns the angle between a and b.
-func (a *VectorN) Angle(b VectorN) (float64, error) {
-	cross, err := a.Cross(b)
-	if err == nil {
-		return math.Atan2(cross.Norm(), a.Dot(b)), nil
+func (a *VectorN) Angle(b VectorN) float64 {
+	cross := a.Cross(b)
+	if cross == nil {
+		return math.Atan2(cross.Norm(), a.Dot(b))
 	}
-	return 0, err
+	return math.MaxFloat64
 }
 
 // Min Returns the a vector where each component is the lesser of the
@@ -215,9 +215,9 @@ func expandBits(v uint) uint {
 
 // Morton3D Calculates a 30-bit Morton code for the
 // given 3D point located within the unit cube [0,1].
-func Morton3D(v VectorN) (uint, error) { // TODO: decoder
+func Morton3D(v VectorN) uint { // TODO: decoder
 	if len(v.Dimensions) != 3 {
-		return 0, ErrVectorInvalidDimension
+		return 0
 	}
 	x := math.Min(math.Max(v.Get(0)*1024.0, 0.0), 1023.0)
 	y := math.Min(math.Max(v.Get(1)*1024.0, 0.0), 1023.0)
@@ -225,5 +225,5 @@ func Morton3D(v VectorN) (uint, error) { // TODO: decoder
 	xx := expandBits(uint(x))
 	yy := expandBits(uint(y))
 	zz := expandBits(uint(z))
-	return xx*4 + yy*2 + zz, nil
+	return xx*4 + yy*2 + zz
 }

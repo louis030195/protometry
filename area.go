@@ -7,23 +7,23 @@ import (
 )
 
 // In Returns whether the specified point is contained in this box.
-func (a *VectorN) In(box Box) (bool, error) {
+func (a *VectorN) In(box Box) bool {
 	if len(a.Dimensions) != len(box.min.Dimensions) {
-		return false, ErrVectorInvalidDimension
+		return false
 	}
 
 	for i := range a.Dimensions {
 		if box.min.Get(i) > a.Get(i) || box.max.Get(i) < a.Get(i) {
-			return false, nil
+			return false
 		}
 	}
-	return true, nil
+	return true
 }
 
 // Area is a 3-d interface representing volumes like Boxes, Spheres, Capsules ...
 type Area interface {
-	Fit(Area) (bool, error)
-	Intersects(Area) (bool, error)
+	Fit(Area) bool
+	Intersects(Area) bool
 }
 
 // Sphere TODO
@@ -44,6 +44,11 @@ type Box struct {
 	max VectorN
 }
 
+// Equal returns whether a box is equal to another
+func (b *Box) Equal(other Box) bool {
+	return b.min.Equal(other.min) && b.max.Equal(other.max)
+}
+
 // GetMin ...
 func (b *Box) GetMin() VectorN {
 	return b.min
@@ -54,6 +59,7 @@ func (b *Box) GetMax() VectorN {
 	return b.max
 }
 
+// GetSize returns the size of the box
 func (b *Box) GetSize() float64 {
 	return math.Abs(b.max.Distance(b.min))
 }
@@ -69,6 +75,7 @@ func NewBox(dims ...float64) *Box {
 	}
 }
 
+// NewBoxOfSize returns a box of size centered at position
 func NewBoxOfSize(position VectorN, size float64) *Box {
 	return &Box{
 		min: *position.Sub(*NewVectorN(size, size, size)),
@@ -77,29 +84,21 @@ func NewBoxOfSize(position VectorN, size float64) *Box {
 }
 
 // Fit Returns whether the specified area is fully contained in the other area.
-func (b *Box) Fit(o Box) (bool, error) {
-	minIn, errMin := b.min.In(o)
-	if errMin != nil {
-		return false, errMin
-	}
-	maxIn, errMax := b.max.In(o)
-	if errMax != nil {
-		return false, errMax
-	}
-	return minIn && maxIn, nil
+func (b *Box) Fit(o Box) bool {
+	return b.min.In(o) && b.max.In(o)
 }
 
 // Intersects Returns whether any portion of this area intersects with the specified area or reversely.
-func (b *Box) Intersects(o Box) (bool, error) {
+func (b *Box) Intersects(o Box) bool {
 	if len(b.min.Dimensions) != len(o.min.Dimensions) {
-		return false, ErrVectorInvalidDimension
+		return false
 	}
 	for i := range b.min.Dimensions {
 		if b.max.Get(i) < o.min.Get(i) || o.max.Get(i) < b.min.Get(i) {
-			return false, nil
+			return false
 		}
 	}
-	return true, nil
+	return true
 }
 
 // MakeSubBoxes split a box into subAreas

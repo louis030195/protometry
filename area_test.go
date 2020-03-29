@@ -8,58 +8,25 @@ import (
 
 func TestVectorN_In(t *testing.T) {
 	a := NewBox(0, 0, 0, 1, 1, 1)
-	in, err := NewVectorN(1, 1, 1).In(*a)
-	Equals(t, nil, err)
-	if err == nil {
-		Equals(t, true, in)
-	} else {
-		t.Fatal(err)
-	}
-	if in, err := NewVectorN(0, 0, 0).In(*a); err == nil {
-		Equals(t, true, in)
-	} else {
-		t.Fatal(err)
-	}
-	if in, err := NewVectorN(1, 0, 0).In(*a); err == nil {
-		Equals(t, true, in)
-	} else {
-		t.Fatal(err)
-	}
-	if in, err := NewVectorN(0, 0, 1).In(*a); err == nil {
-		Equals(t, true, in)
-	} else {
-		t.Fatal(err)
-	}
-	if in, err := NewVectorN(0.5, 0.5, 0.5).In(*a); err == nil {
-		Equals(t, true, in)
-	} else {
-		t.Fatal(err)
-	}
-	if in, err := NewVectorN(-0.000001, 0.5, 0.5).In(*a); err == nil {
-		Equals(t, false, in)
-	} else {
-		t.Fatal(err)
-	}
-	if in, err := NewVectorN(0.5, -0.000001, 0.5).In(*a); err == nil {
-		Equals(t, false, in)
-	} else {
-		t.Fatal(err)
-	}
-	if in, err := NewVectorN(0.5, 0.5, -0.000001).In(*a); err == nil {
-		Equals(t, false, in)
-	} else {
-		t.Fatal(err)
-	}
-	if in, err := NewVectorN(0.5, 1.000001, 0.5).In(*a); err == nil {
-		Equals(t, false, in)
-	} else {
-		t.Fatal(err)
-	}
-	if in, err := NewVectorN(0.5, 0.5, 1.000001).In(*a); err == nil {
-		Equals(t, false, in)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, NewVectorN(1, 1, 1).In(*a))
+
+	Equals(t, true, NewVectorN(0, 0, 0).In(*a))
+
+	Equals(t, true, NewVectorN(1, 0, 0).In(*a))
+
+	Equals(t, true, NewVectorN(0, 0, 1).In(*a))
+
+	Equals(t, true, NewVectorN(0.5, 0.5, 0.5).In(*a))
+
+	Equals(t, false, NewVectorN(-0.000001, 0.5, 0.5).In(*a))
+
+	Equals(t, false, NewVectorN(0.5, -0.000001, 0.5).In(*a))
+
+	Equals(t, false, NewVectorN(0.5, 0.5, -0.000001).In(*a))
+
+	Equals(t, false, NewVectorN(0.5, 1.000001, 0.5).In(*a))
+
+	Equals(t, false, NewVectorN(0.5, 0.5, 1.000001).In(*a))
 }
 
 func TestBox_Fit(t *testing.T) {
@@ -67,68 +34,34 @@ func TestBox_Fit(t *testing.T) {
 	b := NewBox(0, 0, 0, 1, 1, 1)
 
 	// contains equal Box, symmetrically
-	if Fit, err := a.Fit(*b); err == nil {
-		Equals(t, true, Fit)
-	} else {
-		t.Fatal(err)
-	}
-	if Fit, err := a.Fit(*b); err == nil {
-		Equals(t, true, Fit)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Fit(*b))
+
+	Equals(t, true, a.Fit(*b))
 
 	// contained on edge
 	b = NewBox(0, 0, 0, 0.5, 1, 1)
 
-	if Fit, err := b.Fit(*a); err == nil {
-		Equals(t, true, Fit)
-	} else {
-		t.Fatal(err)
-	}
-	if Fit, err := a.Fit(*b); err == nil {
-		Equals(t, false, Fit)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, b.Fit(*a))
+
+	Equals(t, false, a.Fit(*b))
 
 	// contained away from edges
 	b = NewBox(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
-	if Fit, err := b.Fit(*a); err == nil {
-		Equals(t, true, Fit)
-	} else {
-		t.Fatal(err)
-	}
-	if Fit, err := a.Fit(*b); err == nil {
-		Equals(t, false, Fit)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, b.Fit(*a))
+
+	Equals(t, false, a.Fit(*b))
 
 	// 1 corner Fit
 	b = NewBox(-0.1, -0.1, -0.1, 0.9, 0.9, 0.9)
-	if Fit, err := b.Fit(*a); err == nil {
-		Equals(t, false, Fit)
-	} else {
-		t.Fatal(err)
-	}
-	if Fit, err := a.Fit(*b); err == nil {
-		Equals(t, false, Fit)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, false, b.Fit(*a))
+
+	Equals(t, false, a.Fit(*b))
 
 	b = NewBox(0.9, 0.9, 0.9, 1.1, 1.1, 1.1)
-	if Fit, err := b.Fit(*a); err == nil {
-		Equals(t, false, Fit)
-	} else {
-		t.Fatal(err)
-	}
-	if Fit, err := a.Fit(*b); err == nil {
-		Equals(t, false, Fit)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, false, b.Fit(*a))
+
+	Equals(t, false, a.Fit(*b))
+
 }
 
 func TestBox_Intersects(t *testing.T) {
@@ -136,128 +69,66 @@ func TestBox_Intersects(t *testing.T) {
 	b := NewBox(1.1, 0, 0, 2, 1, 1)
 
 	// not intersecting area above or below in each dimension
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, false, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, false, a.Intersects(*b))
+
 	b = NewBox(-1, 0, 0, -0.1, 1, 1)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, false, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, false, a.Intersects(*b))
+
 	b = NewBox(0, 1.1, 0, 1, 2, 1)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, false, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, false, a.Intersects(*b))
+
 	b = NewBox(0, -1, 0, 1, -0.1, 1)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, false, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, false, a.Intersects(*b))
+
 	b = NewBox(0, 0, 1.1, 1, 1, 2)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, false, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, false, a.Intersects(*b))
+
 	b = NewBox(0, 0, -1, 1, 1, -0.1)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, false, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, false, a.Intersects(*b))
 
 	// intersects equal Box, symmetrically
 	b = NewBox(0, 0, 0, 1, 1, 1)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
 
 	// intersects containing and contained
 	b = NewBox(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
 
 	// intersects partial containment on each corner
 	b = NewBox(0.9, 0.9, 0.9, 2, 2, 2)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
+
 	b = NewBox(-1, 0.9, 0.9, 1, 2, 2)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
+
 	b = NewBox(0.9, -1, 0.9, 2, 0.1, 2)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
+
 	b = NewBox(-1, -1, 0.9, 0.1, 0.1, 2)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
+
 	b = NewBox(0.9, 0.9, -1, 2, 2, 0.1)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
+
 	b = NewBox(-1, 0.9, -1, 0.1, 2, 0.1)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
+
 	b = NewBox(0.9, -1, -1, 2, 0.1, 0.1)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
+
 	b = NewBox(-1, -1, -1, 0.1, 0.1, 0.1)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
 
 	// intersects 'beam'; where no corners Fit
 	// other but some contained
 	b = NewBox(-1, 0.1, 0.1, 2, 0.9, 0.9)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
+
 	b = NewBox(0.1, -1, 0.1, 0.9, 2, 0.9)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
+
 	b = NewBox(0.1, 0.1, -1, 0.9, 0.9, 2)
-	if intersects, err := a.Intersects(*b); err == nil {
-		Equals(t, true, intersects)
-	} else {
-		t.Fatal(err)
-	}
+	Equals(t, true, a.Intersects(*b))
 }
 
 func TestNewBoxOfSize(t *testing.T) {
