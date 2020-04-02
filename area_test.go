@@ -62,6 +62,15 @@ func TestBox_Fit(t *testing.T) {
 
 	Equals(t, false, a.Fit(*b))
 
+	// Other
+	a = NewBox(1, 1, 1, 4, 4, 4)
+	b = NewBox(0, 0, 0, 1, 1, 1)
+	Equals(t, false, b.Fit(*a))
+	Equals(t, false, a.Fit(*b))
+	b = NewBox(1, 1, 1, 1, 1, 1)
+	Equals(t, true, b.Fit(*a))
+	b = NewBox(1, 1, 1, 4, 4, 4)
+	Equals(t, true, b.Fit(*a))
 }
 
 func TestBox_Intersects(t *testing.T) {
@@ -129,6 +138,16 @@ func TestBox_Intersects(t *testing.T) {
 
 	b = NewBox(0.1, 0.1, -1, 0.9, 0.9, 2)
 	Equals(t, true, a.Intersects(*b))
+
+	// Other
+	a = NewBox(1, 1, 1, 4, 4, 4)
+	b = NewBox(0, 0, 0, 1, 1, 1)
+	Equals(t, true, b.Intersects(*a))
+	Equals(t, true, a.Intersects(*b))
+	b = NewBox(1, 1, 1, 1, 1, 1)
+	Equals(t, true, b.Intersects(*a))
+	b = NewBox(1, 1, 1, 4, 4, 4)
+	Equals(t, true, b.Intersects(*a))
 }
 
 func TestNewBoxOfSize(t *testing.T) {

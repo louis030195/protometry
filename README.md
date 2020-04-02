@@ -43,15 +43,20 @@ a.Fit(*b) // False
 - [x] Normalization
 - [x] Absolute value
 - [x] Add, Sub, Mul(scalar product), Dot(vector product), Div(scalar division), Cross product, Euclidean Norm, Angle, Lerp
-- [ ] Encoding
 
 ### Volumes
 
 - [x] Box Intersections, Fit
-- [ ] Other volumes (sphere, capsule, Convex ...)
 
 ## Test
 
 ```bash
 go test -v github.com/The-Tensox/protometry
 ```
+
+## TODO
+
+- [ ] Encoding
+- [ ] Other volumes (sphere, capsule, Convex ...)
+- [ ] Set() for all dimensions at once using lambda
+- [ ] Take inspiration from [numpy](https://numpy.org)

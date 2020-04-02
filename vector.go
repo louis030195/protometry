@@ -3,6 +3,7 @@ package protometry
 import (
 	"fmt"
 	"math"
+	"math/rand"
 )
 
 // NewVectorN constructs a VectorN
@@ -51,6 +52,13 @@ func (a *VectorN) Set(dimension int, value float64) error {
 	}
 	a.Dimensions[dimension] = value
 	return nil
+}
+
+// SetAll is used to shorten dimensions assignment
+func (a *VectorN) SetAll(value float64) {
+	for i := range a.Dimensions {
+		a.Dimensions[i] = value
+	}
 }
 
 // ToString returns the vector to string
@@ -226,4 +234,22 @@ func Morton3D(v VectorN) uint { // TODO: decoder
 	yy := expandBits(uint(y))
 	zz := expandBits(uint(z))
 	return xx*4 + yy*2 + zz
+}
+
+func randFloat(min, max float64) float64 {
+	return min + rand.Float64()*(max-min)
+}
+
+// RandomCirclePoint returns a random circle point
+func RandomCirclePoint(center VectorN, radius float64) VectorN {
+	return *NewVectorN(randFloat(-radius+center.Get(0), radius+center.Get(0)),
+		0,
+		randFloat(-radius+center.Get(1), radius+center.Get(1)))
+}
+
+// RandomSpherePoint returns a random sphere point
+func RandomSpherePoint(center VectorN, radius float64) VectorN {
+	return *NewVectorN(randFloat(-radius+center.Get(0), radius+center.Get(0)),
+		randFloat(-radius+center.Get(1), radius+center.Get(1)),
+		randFloat(-radius+center.Get(1), radius+center.Get(1)))
 }
