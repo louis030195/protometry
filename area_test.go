@@ -499,35 +499,35 @@ func TestBox_Split(t *testing.T) {
 		NewBoxMinMax(0.5, 0, 0, 1, 0.5, 0.5),
 	}
 	got := b.Split()
-	t.Logf("\nBefore split \n%v", b.ToString())
-	for i := range want {
-		t.Logf("\nMin%v\nWant%v\n\nMax%v\nWant%v\n\nCenter%v\nWant%v\n\nExtents%v\nWant%v\n",
-			got[i].GetMin(),
-			want[i].GetMin(),
-			got[i].GetMax(),
-			want[i].GetMax(),
-			got[i].Center,
-			want[i].Center,
-			got[i].Extents,
-			want[i].Extents,
-		)
-		//Equals(t, true, want[i].Center.Equal(sub[i].Center))
-		//Equals(t, true, want[i].Extents.Equal(sub[i].Extents))
+	tester := func(got, want [8]*Box) {
+		t.Logf("\nBefore split \n%v", b.ToString())
+		for i := range want {
+			t.Logf("\nMin%v\nWant%v\n\nMax%v\nWant%v\n\nCenter%v\nWant%v\n\nExtents%v\nWant%v\n",
+				got[i].GetMin(),
+				want[i].GetMin(),
+				got[i].GetMax(),
+				want[i].GetMax(),
+				got[i].Center,
+				want[i].Center,
+				got[i].Extents,
+				want[i].Extents,
+			)
+			Equals(t, want[i].Center, got[i].Center)
+			Equals(t, want[i].Extents, got[i].Extents)
+		}
 	}
-	// b = Box{min: *NewVectorN(-5, -5, -5), max: *NewVectorN(5, 5, 5)}
-	// want = [8]*Box{
-	// 	NewBox(0, 0, 0, 5, 5, 5),
-	// 	NewBox(-5, 0, 0, 0, 5, 5),
-	// 	NewBox(-5, -5, 0, 0, 0, 5),
-	// 	NewBox(0, -5, 0, 5, 0, 5),
-	// 	NewBox(0, 0, -5, 5, 5, 0),
-	// 	NewBox(-5, 0, -5, 0, 5, 0),
-	// 	NewBox(-5, -5, -5, 0, 0, 0),
-	// 	NewBox(0, -5, -5, 5, 0, 0),
-	// }
-	// sub = b.MakeSubBoxes()
-	// for i := range want {
-	// 	Equals(t, true, want[i].min.Equal(sub[i].min))
-	// 	Equals(t, true, want[i].max.Equal(sub[i].max))
-	// }
+	tester(got, want)
+	b = *NewBoxMinMax(-5, -5, -5, 5, 5, 5)
+	want = [8]*Box{
+		NewBoxMinMax(0, 0, 0, 5, 5, 5),
+		NewBoxMinMax(-5, 0, 0, 0, 5, 5),
+		NewBoxMinMax(-5, -5, 0, 0, 0, 5),
+		NewBoxMinMax(0, -5, 0, 5, 0, 5),
+		NewBoxMinMax(0, 0, -5, 5, 5, 0),
+		NewBoxMinMax(-5, 0, -5, 0, 5, 0),
+		NewBoxMinMax(-5, -5, -5, 0, 0, 0),
+		NewBoxMinMax(0, -5, -5, 5, 0, 0),
+	}
+	got = b.Split()
+	tester(got, want)
 }

@@ -205,38 +205,54 @@ func (b *Box) Split() [8]*Box {
 	// }
 	// return split
 
-	// bm := b.GetMin()
-	// bmm := b.GetMax()
-	// return [8]*Box{
-	// 	NewBoxMinMax(bmm.Get(0), bmm.Get(1), bmm.Get(2),
-	// 		b.Center.Get(0), b.Center.Get(1), b.Center.Get(2)),
-	// 	NewBoxMinMax(b.Center.Get(0), bmm.Get(1), bmm.Get(2),
-	// 		bm.Get(0), b.Center.Get(1), b.Center.Get(2)),
-	// 	NewBoxMinMax(b.Center.Get(0), b.Center.Get(1), bmm.Get(2),
-	// 		bm.Get(0), bm.Get(1), b.Center.Get(2)),
-	// 	NewBoxMinMax(bmm.Get(0), b.Center.Get(1), bmm.Get(2),
-	// 		b.Center.Get(0), bm.Get(1), b.Center.Get(2)),
-	// 	NewBoxMinMax(bmm.Get(0), bmm.Get(1), b.Center.Get(2),
-	// 		b.Center.Get(0), b.Center.Get(1), bm.Get(2)),
-	// 	NewBoxMinMax(b.Center.Get(0), bmm.Get(1), b.Center.Get(2),
-	// 		bm.Get(0), b.Center.Get(1), bm.Get(2)),
-	// 	NewBoxMinMax(b.Center.Get(0), b.Center.Get(1), b.Center.Get(2),
-	// 		bm.Get(0), bm.Get(1), bm.Get(2)),
-	// 	NewBoxMinMax(bmm.Get(0), b.Center.Get(1), b.Center.Get(2),
-	// 		b.Center.Get(0), bm.Get(1), bm.Get(2)),
-	// }
-	quarter := b.Extents.Get(0) / 2 // Assuming cube
-	newLength := b.Extents.Get(0) / 2
+	bm := b.GetMin()
+	bmm := b.GetMax()
 	return [8]*Box{
-		NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, quarter, -quarter)), newLength),
-		NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, quarter, -quarter)), newLength),
-		NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, quarter, quarter)), newLength),
-		NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, -quarter, -quarter)), newLength),
-		NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, -quarter, -quarter)), newLength),
-		NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, -quarter, -quarter)), newLength),
-		NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, -quarter, quarter)), newLength),
-		NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, -quarter, quarter)), newLength),
+		NewBoxMinMax(
+			b.Center.Get(0), b.Center.Get(1), b.Center.Get(2),
+			bmm.Get(0), bmm.Get(1), bmm.Get(2),
+		),
+		NewBoxMinMax(
+			bm.Get(0), b.Center.Get(1), b.Center.Get(2),
+			b.Center.Get(0), bmm.Get(1), bmm.Get(2),
+		),
+		NewBoxMinMax(
+			bm.Get(0), bm.Get(1), b.Center.Get(2),
+			b.Center.Get(0), b.Center.Get(1), bmm.Get(2),
+		),
+		NewBoxMinMax(
+			b.Center.Get(0), bm.Get(1), b.Center.Get(2),
+			bmm.Get(0), b.Center.Get(1), bmm.Get(2),
+		),
+		NewBoxMinMax(
+			b.Center.Get(0), b.Center.Get(1), bm.Get(2),
+			bmm.Get(0), bmm.Get(1), b.Center.Get(2),
+		),
+		NewBoxMinMax(
+			bm.Get(0), b.Center.Get(1), bm.Get(2),
+			b.Center.Get(0), bmm.Get(1), b.Center.Get(2),
+		),
+		NewBoxMinMax(
+			bm.Get(0), bm.Get(1), bm.Get(2),
+			b.Center.Get(0), b.Center.Get(1), b.Center.Get(2),
+		),
+		NewBoxMinMax(
+			b.Center.Get(0), bm.Get(1), bm.Get(2),
+			bmm.Get(0), b.Center.Get(1), b.Center.Get(2),
+		),
 	}
+	// quarter := b.Extents.Get(0) / 2 // Assuming cube
+	// newLength := b.Extents.Get(0)
+	// return [8]*Box{
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, quarter, quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, quarter, quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, -quarter, quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, -quarter, quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, quarter, -quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, quarter, quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, -quarter, -quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, quarter, -quarter)), newLength),
+	// }
 
 }
 
