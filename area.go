@@ -6,14 +6,40 @@ import (
 	"math"
 )
 
-// In Returns whether the specified point is contained in this box.
-func (a *VectorN) In(box Box) bool {
-	if len(a.Dimensions) != len(box.min.Dimensions) {
-		return false
-	}
+/**
+ * https://github.com/vanruesc/sparse-octree/blob/master/src/core/layout.js
+ * A binary pattern that describes the standard octant layout:
+ *
+ * ```text
+ *    3____7
+ *  2/___6/|
+ *  | 1__|_5
+ *  0/___4/
+ * ```
+ *
+ * This common layout is crucial for positional assumptions.
+ *
+ * @type {Uint8Array[]}
+ */
 
-	for i := range a.Dimensions {
-		if box.min.Get(i) > a.Get(i) || box.max.Get(i) < a.Get(i) {
+var boxLayout = [8][3]int{
+	[3]int{0, 0, 0},
+	[3]int{0, 0, 1},
+	[3]int{0, 1, 0},
+	[3]int{0, 1, 1},
+
+	[3]int{1, 0, 0},
+	[3]int{1, 0, 1},
+	[3]int{1, 1, 0},
+	[3]int{1, 1, 1},
+}
+
+// In Returns whether the specified point is contained in this box.
+func (v *VectorN) In(box Box) bool {
+	bm := box.GetMin()
+	bmm := box.GetMax()
+	for i := range v.Dimensions {
+		if bm.Get(i) > v.Get(i) || bmm.Get(i) < v.Get(i) {
 			return false
 		}
 	}
@@ -40,106 +66,169 @@ type Convex struct {
 
 // Box ...
 type Box struct {
-	min VectorN
-	max VectorN
+	Center  VectorN
+	Extents VectorN
 }
 
 // Equal returns whether a box is equal to another
 func (b *Box) Equal(other Box) bool {
-	return b.min.Equal(other.min) && b.max.Equal(other.max)
+	return b.Center.Equal(other.Center) && b.Extents.Equal(other.Extents)
 }
 
 // GetMin ...
 func (b *Box) GetMin() VectorN {
-	return b.min
+	return *b.Center.Minus(b.Extents)
 }
 
 // GetMax ...
 func (b *Box) GetMax() VectorN {
-	return b.max
+	return *b.Center.Plus(b.Extents)
 }
 
 // GetSize returns the size of the box
-func (b *Box) GetSize() float64 {
-	return math.Abs(b.max.Distance(b.min))
+func (b *Box) GetSize() VectorN {
+	return *b.Extents.Times(2)
 }
 
-// NewBox constructs and returns a new box
-func NewBox(dims ...float64) *Box {
-	if len(dims) != 6 {
-		return nil
-	}
+// NewBoxMinMax returns a new box using min max
+func NewBoxMinMax(dims ...float64) *Box {
+	b := &Box{}
+	b.SetMinMax(*NewVectorN(dims[0:3]...), *NewVectorN(dims[3:6]...))
+	return b
+}
+
+// NewBoxOfSize returns a box of size centered at center
+func NewBoxOfSize(center VectorN, size float64) *Box {
 	return &Box{
-		min: Min(*NewVectorN(dims[0:3]...), *NewVectorN(dims[3:6]...)),
-		max: Max(*NewVectorN(dims[0:3]...), *NewVectorN(dims[3:6]...)),
+		Center:  center,
+		Extents: *NewVectorN(size, size, size),
 	}
 }
 
-// NewBoxOfSize returns a box of size centered at position
-func NewBoxOfSize(position VectorN, size float64) *Box {
-	return &Box{
-		min: *position.Sub(*NewVectorN(size, size, size)),
-		max: *position.Add(*NewVectorN(size, size, size)),
-	}
+// SetMinMax sets the bounds to the /min/ and /max/ value of the box.
+func (b *Box) SetMinMax(min, max VectorN) {
+	b.Extents = *(max.Minus(min)).Times(0.5)
+	b.Center = *min.Plus(b.Extents)
+}
+
+// EncapsulatePoint grows the Bounds to include the /point/.
+func (b *Box) EncapsulatePoint(point VectorN) {
+	b.SetMinMax(Min(b.GetMin(), point), Max(b.GetMax(), point))
+}
+
+// EncapsulateBox grows the box to include the /box/.
+func (b *Box) EncapsulateBox(box Box) {
+	b.EncapsulatePoint(*box.Center.Minus(box.Extents))
+	b.EncapsulatePoint(*box.Center.Plus(box.Extents))
+}
+
+// Expand the box by increasing its /size/ by /amount/ along each side.
+func (b *Box) Expand(amount float64) {
+	amount *= .5
+	b.Extents = *b.Extents.Plus(*NewVectorN(amount, amount, amount))
+}
+
+// ExpandV the box by increasing its /size/ by /amount/ along each side.
+func (b *Box) ExpandV(amount VectorN) {
+	b.Extents = *b.Extents.Plus(*amount.Times(.5))
 }
 
 // Fit Returns whether the specified area is fully contained in the other area.
 func (b *Box) Fit(o Box) bool {
-	return b.min.In(o) && b.max.In(o)
+	bm := b.GetMin()
+	bmm := b.GetMax()
+	return bm.In(o) && bmm.In(o)
 }
 
 // Intersects Returns whether any portion of this area intersects with the specified area or reversely.
-func (b *Box) Intersects(o Box) bool {
-	if len(b.min.Dimensions) != len(o.min.Dimensions) {
-		return false
-	}
-	for i := range b.min.Dimensions {
-		if b.max.Get(i) < o.min.Get(i) || o.max.Get(i) < b.min.Get(i) {
+func (b *Box) Intersects(bb Box) bool {
+	bm := b.GetMin()
+	bmm := b.GetMax()
+	bbm := bb.GetMin()
+	bbmm := bb.GetMax()
+	for i := range bm.Dimensions {
+		if bmm.Get(i) < bbm.Get(i) || bbmm.Get(i) < bm.Get(i) {
 			return false
 		}
 	}
 	return true
 }
 
-// MakeSubBoxes split a box into subAreas
-// TODO: not sure if it's correct, MAKE TEST
-func (b *Box) MakeSubBoxes() [8]*Box {
-	// gets the child boxes (octants) of the box.
-	center := b.min.Lerp(&b.max, 0.5)
-
-	return [8]*Box{
-		NewBox(b.max.Get(0), b.max.Get(1), b.max.Get(2),
-			center.Get(0), center.Get(1), center.Get(2)),
-		NewBox(center.Get(0), b.max.Get(1), b.max.Get(2),
-			b.min.Get(0), center.Get(1), center.Get(2)),
-		NewBox(center.Get(0), center.Get(1), b.max.Get(2),
-			b.min.Get(0), b.min.Get(1), center.Get(2)),
-		NewBox(b.max.Get(0), center.Get(1), b.max.Get(2),
-			center.Get(0), b.min.Get(1), center.Get(2)),
-		NewBox(b.max.Get(0), b.max.Get(1), center.Get(2),
-			center.Get(0), center.Get(1), b.min.Get(2)),
-		NewBox(center.Get(0), b.max.Get(1), center.Get(2),
-			b.min.Get(0), center.Get(1), b.min.Get(2)),
-		NewBox(center.Get(0), center.Get(1), center.Get(2),
-			b.min.Get(0), b.min.Get(1), b.min.Get(2)),
-		NewBox(b.max.Get(0), center.Get(1), center.Get(2),
-			center.Get(0), b.min.Get(1), b.min.Get(2)),
+// Split split a box into subAreas
+func (b *Box) Split() [8]*Box {
+	min := b.GetMin()
+	center := b.Center
+	halfSize := b.Extents.Get(0) / 2 // Assume cube
+	var split [8]*Box
+	var x, y, z float64
+	for i := 0; i < 8; i++ {
+		combination := boxLayout[i]
+		if combination[0] == 0 {
+			x = min.Get(0)
+		} else {
+			x = center.Get(0)
+		}
+		if combination[1] == 0 {
+			y = min.Get(1)
+		} else {
+			y = center.Get(1)
+		}
+		if combination[2] == 0 {
+			z = min.Get(2)
+		} else {
+			z = center.Get(2)
+		}
+		split[i] = NewBoxOfSize(*NewVectorN(x, y, z), halfSize)
 	}
-}
+	return split
 
-func (b *Box) GetCenter() *VectorN {
-	return b.min.Lerp(&b.max, 0.5)
+	//quarter := b.Extents.Get(0) / 4 // Assuming cube
+	//newLength := b.Extents.Get(0) / 2
+	// bm := b.GetMin()
+	// bmm := b.GetMax()
+	// return [8]*Box{
+	// 	NewBoxMinMax(bmm.Get(0), bmm.Get(1), bmm.Get(2),
+	// 		b.Center.Get(0), b.Center.Get(1), b.Center.Get(2)),
+	// 	NewBoxMinMax(b.Center.Get(0), bmm.Get(1), bmm.Get(2),
+	// 		bm.Get(0), b.Center.Get(1), b.Center.Get(2)),
+	// 	NewBoxMinMax(b.Center.Get(0), b.Center.Get(1), bmm.Get(2),
+	// 		bm.Get(0), bm.Get(1), b.Center.Get(2)),
+	// 	NewBoxMinMax(bmm.Get(0), b.Center.Get(1), bmm.Get(2),
+	// 		b.Center.Get(0), bm.Get(1), b.Center.Get(2)),
+	// 	NewBoxMinMax(bmm.Get(0), bmm.Get(1), b.Center.Get(2),
+	// 		b.Center.Get(0), b.Center.Get(1), bm.Get(2)),
+	// 	NewBoxMinMax(b.Center.Get(0), bmm.Get(1), b.Center.Get(2),
+	// 		bm.Get(0), b.Center.Get(1), bm.Get(2)),
+	// 	NewBoxMinMax(b.Center.Get(0), b.Center.Get(1), b.Center.Get(2),
+	// 		bm.Get(0), bm.Get(1), bm.Get(2)),
+	// 	NewBoxMinMax(bmm.Get(0), b.Center.Get(1), b.Center.Get(2),
+	// 		b.Center.Get(0), bm.Get(1), bm.Get(2)),
+	// }
+	// return [8]*Box{
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, quarter, -quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, quarter, -quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, quarter, quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, -quarter, -quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, -quarter, -quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, -quarter, -quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, -quarter, quarter)), newLength),
+	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, -quarter, quarter)), newLength),
+	// }
+
 }
 
 // MinimumTranslation tells how much an entity has to move to no longer overlap another entity.
 // TODO: 3D
-func MinimumTranslation(a, b Box) VectorN {
+func MinimumTranslation(b, bb Box) VectorN {
 	mtd := VectorN{}
-
-	left := b.min.Get(0) - a.max.Get(0)
-	right := b.max.Get(0) - a.min.Get(0)
-	top := b.min.Get(1) - a.max.Get(1)
-	bottom := b.max.Get(1) - a.min.Get(1)
+	bm := b.GetMin()
+	bmm := b.GetMax()
+	bbm := bb.GetMin()
+	bbmm := bb.GetMax()
+	left := bm.Get(0) - bbmm.Get(0)
+	right := bmm.Get(0) - bbm.Get(0)
+	top := bm.Get(1) - bbmm.Get(1)
+	bottom := bmm.Get(1) - bbm.Get(1)
 
 	if left > 0 || right < 0 {
 		log.Println("Box aint intercepting")
@@ -175,5 +264,5 @@ func MinimumTranslation(a, b Box) VectorN {
 
 // ToString returns a human-readable representation of the box
 func (b *Box) ToString() string {
-	return fmt.Sprintf("min: %v, max: %v", b.min.ToString(), b.max.ToString())
+	return fmt.Sprintf("Center: %v, Extents: %v", b.Center.ToString(), b.Extents.ToString())
 }

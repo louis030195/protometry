@@ -289,3 +289,59 @@ func TestVectorN_Set(t *testing.T) {
 		})
 	}
 }
+
+func TestConcatenate(t *testing.T) {
+	type args struct {
+		v []VectorN
+	}
+	tests := []struct {
+		name string
+		args args
+		want VectorN
+	}{
+		{
+			args: args{v: []VectorN{*NewVectorN(1, 2, 3), *NewVectorN(4, 5, 6)}},
+			want: *NewVectorN(1, 2, 3, 4, 5, 6),
+		},
+		{
+			args: args{v: []VectorN{*NewVectorN(4, 5, 6), *NewVectorN(1, 2, 3)}},
+			want: *NewVectorN(4, 5, 6, 1, 2, 3),
+		},
+		{
+			args: args{v: []VectorN{*NewVectorN(1, 2), *NewVectorN(5, 6)}},
+			want: *NewVectorN(1, 2, 5, 6),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Concatenate(tt.args.v...); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Concatenate() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestMin(t *testing.T) {
+	type args struct {
+		a VectorN
+		b VectorN
+	}
+	tests := []struct {
+		name string
+		args args
+		want VectorN
+	}{
+		// TODO: Add test cases.
+		{
+			args: args{*NewVectorN(1, 2, 3), *NewVectorN(4, 5, 6)},
+			want: *NewVectorN(1, 2, 3),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := Min(tt.args.a, tt.args.b); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Min() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

@@ -100,7 +100,7 @@ func (a *VectorN) Normalize() *VectorN {
 	if n2 == 0 {
 		return NewVectorN(0, 0, 0)
 	}
-	return a.Mul(1 / math.Sqrt(n2))
+	return a.Times(1 / math.Sqrt(n2))
 }
 
 // Abs returns the vector with nonnegative components.
@@ -112,8 +112,8 @@ func (a *VectorN) Abs() *VectorN {
 	return NewVectorN(res...)
 }
 
-// Add returns the standard vector sum of a and b.
-func (a *VectorN) Add(b VectorN) *VectorN {
+// Plus returns the standard vector sum of a and b.
+func (a *VectorN) Plus(b VectorN) *VectorN {
 	var res []float64
 	for i := range a.Dimensions {
 		res = append(res, a.Get(i)+b.Get(i))
@@ -121,8 +121,8 @@ func (a *VectorN) Add(b VectorN) *VectorN {
 	return NewVectorN(res...)
 }
 
-// Sub returns the standard vector difference of a and b.
-func (a *VectorN) Sub(b VectorN) *VectorN {
+// Minus returns the standard vector difference of a and b.
+func (a *VectorN) Minus(b VectorN) *VectorN {
 	var res []float64
 	for i := range a.Dimensions {
 		res = append(res, a.Get(i)-b.Get(i))
@@ -130,8 +130,8 @@ func (a *VectorN) Sub(b VectorN) *VectorN {
 	return NewVectorN(res...)
 }
 
-// Mul returns the standard scalar product of a and m.
-func (a *VectorN) Mul(m float64) *VectorN {
+// Times returns the standard scalar product of a and m.
+func (a *VectorN) Times(m float64) *VectorN {
 	for i := range a.Dimensions {
 		a.Dimensions[i] *= m
 	}
@@ -171,7 +171,7 @@ func (a *VectorN) Cross(b VectorN) *VectorN {
 }
 
 // Distance returns the Euclidean distance between a and b.
-func (a *VectorN) Distance(b VectorN) float64 { return math.Sqrt(a.Sub(b).Pow().Sum()) }
+func (a *VectorN) Distance(b VectorN) float64 { return math.Sqrt(a.Minus(b).Pow().Sum()) }
 
 // Angle returns the angle between a and b.
 func (a *VectorN) Angle(b VectorN) float64 {
@@ -252,4 +252,13 @@ func RandomSpherePoint(center VectorN, radius float64) VectorN {
 	return *NewVectorN(randFloat(-radius+center.Get(0), radius+center.Get(0)),
 		randFloat(-radius+center.Get(1), radius+center.Get(1)),
 		randFloat(-radius+center.Get(1), radius+center.Get(1)))
+}
+
+// Concatenate join a sequence of arrays.
+func Concatenate(v ...VectorN) VectorN {
+	newV := VectorN{}
+	for i := range v {
+		newV.Dimensions = append(newV.Dimensions, v[i].Dimensions...)
+	}
+	return newV
 }
