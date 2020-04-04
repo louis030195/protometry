@@ -288,6 +288,9 @@ func TestVectorN_Set(t *testing.T) {
 			}
 		})
 	}
+	v := NewVectorN(1, 2, 3)
+	v.Set(1, 12.2)
+	Equals(t, 12.2, v.Get(1))
 }
 
 func TestConcatenate(t *testing.T) {
@@ -336,6 +339,10 @@ func TestMin(t *testing.T) {
 			args: args{*NewVectorN(1, 2, 3), *NewVectorN(4, 5, 6)},
 			want: *NewVectorN(1, 2, 3),
 		},
+		{
+			args: args{*NewVectorN(1, 2, 3), *NewVectorN(0, 5, 6)},
+			want: *NewVectorN(0, 2, 3),
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -344,4 +351,60 @@ func TestMin(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestVectorN_Scale(t *testing.T) {
+	type fields struct {
+		Dimensions           []float64
+		XXX_NoUnkeyedLiteral struct{}
+		XXX_unrecognized     []byte
+		XXX_sizecache        int32
+	}
+	type args struct {
+		m float64
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *VectorN
+	}{
+		// TODO: Add test cases.
+		{
+			fields: fields{Dimensions: []float64{1, 2, 3}},
+			args:   args{0.5},
+			want:   NewVectorN(0.5, 1, 1.5),
+		},
+		{
+			fields: fields{Dimensions: []float64{1, 2, 3, 7, 12.4, -27.8}},
+			args:   args{0.5},
+			want:   NewVectorN(0.5, 1, 1.5, 3.5, 6.2, -13.9),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			a := &VectorN{
+				Dimensions:           tt.fields.Dimensions,
+				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
+				XXX_unrecognized:     tt.fields.XXX_unrecognized,
+				XXX_sizecache:        tt.fields.XXX_sizecache,
+			}
+			if got := a.Scale(tt.args.m); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("VectorN.Scale() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+	a := NewVectorN(12, 4, 6)
+	b := a.Scale(0.5)
+	Equals(t, NewVectorN(12, 4, 6), a)
+	Equals(t, NewVectorN(6, 2, 3), b)
+}
+
+func TestVectorN_Clone(t *testing.T) {
+	a := NewVectorN(12, 4, 6)
+	b := a.Clone()
+	a.Dimensions[0] = 27
+	Equals(t, 27., a.Dimensions[0])
+	t.Logf("B: %v", b.ToString())
+	Equals(t, 12., b.Dimensions[0])
 }

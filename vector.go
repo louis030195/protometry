@@ -11,6 +11,15 @@ func NewVectorN(dimensions ...float64) *VectorN {
 	return &VectorN{Dimensions: dimensions}
 }
 
+// Clone a vector
+func (a *VectorN) Clone() *VectorN {
+	var res []float64
+	for i := range a.Dimensions {
+		res = append(res, a.Get(i))
+	}
+	return NewVectorN(res...)
+}
+
 // NewVector3Zero constructs a VectorN of 3 dimensions initialized with 0
 func NewVector3Zero() *VectorN {
 	return &VectorN{Dimensions: []float64{0, 0, 0}}
@@ -100,7 +109,7 @@ func (a *VectorN) Normalize() *VectorN {
 	if n2 == 0 {
 		return NewVectorN(0, 0, 0)
 	}
-	return a.Times(1 / math.Sqrt(n2))
+	return a.Scale(1 / math.Sqrt(n2))
 }
 
 // Abs returns the vector with nonnegative components.
@@ -130,12 +139,13 @@ func (a *VectorN) Minus(b VectorN) *VectorN {
 	return NewVectorN(res...)
 }
 
-// Times returns the standard scalar product of a and m.
-func (a *VectorN) Times(m float64) *VectorN {
+// Scale returns the standard scalar product of a and m.
+func (a *VectorN) Scale(m float64) *VectorN {
+	var res []float64
 	for i := range a.Dimensions {
-		a.Dimensions[i] *= m
+		res = append(res, a.Get(i)*m)
 	}
-	return a
+	return NewVectorN(res...)
 }
 
 // Div returns the standard scalar division of a and m.
