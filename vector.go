@@ -12,10 +12,10 @@ func NewVectorN(dimensions ...float64) *VectorN {
 }
 
 // Clone a vector
-func (a *VectorN) Clone() *VectorN {
+func (v *VectorN) Clone() *VectorN {
 	var res []float64
-	for i := range a.Dimensions {
-		res = append(res, a.Get(i))
+	for i := range v.Dimensions {
+		res = append(res, v.Get(i))
 	}
 	return NewVectorN(res...)
 }
@@ -31,14 +31,14 @@ func NewVector3One() *VectorN {
 }
 
 // Equal reports whether a and b are equal within a small epsilon.
-func (a *VectorN) Equal(b VectorN) bool {
-	if len(a.Dimensions) != len(b.Dimensions) {
+func (v *VectorN) Equal(b VectorN) bool {
+	if len(v.Dimensions) != len(b.Dimensions) {
 		return false
 	}
 	const epsilon = 1e-16
-	for i := range a.Dimensions {
+	for i := range v.Dimensions {
 		// If any dimensions aren't aproximately equal, return false
-		if math.Abs(a.Get(i)-b.Get(i)) >= epsilon {
+		if math.Abs(v.Get(i)-b.Get(i)) >= epsilon {
 			return false
 		}
 	}
@@ -47,147 +47,147 @@ func (a *VectorN) Equal(b VectorN) bool {
 }
 
 // Get is used to shorten access to dimensions
-func (a *VectorN) Get(dimension int) float64 {
-	if dimension < 0 || dimension > len(a.Dimensions)-1 {
+func (v *VectorN) Get(dimension int) float64 {
+	if dimension < 0 || dimension > len(v.Dimensions)-1 {
 		return math.MaxFloat64
 	}
-	return a.Dimensions[dimension]
+	return v.Dimensions[dimension]
 }
 
 // Set is used to shorten dimensions assignment
-func (a *VectorN) Set(dimension int, value float64) error {
-	if dimension < 0 || dimension > len(a.Dimensions)-1 {
+func (v *VectorN) Set(dimension int, value float64) error {
+	if dimension < 0 || dimension > len(v.Dimensions)-1 {
 		return ErrVectorInvalidIndex
 	}
-	a.Dimensions[dimension] = value
+	v.Dimensions[dimension] = value
 	return nil
 }
 
 // SetAll is used to shorten dimensions assignment
-func (a *VectorN) SetAll(value float64) {
-	for i := range a.Dimensions {
-		a.Dimensions[i] = value
+func (v *VectorN) SetAll(value float64) {
+	for i := range v.Dimensions {
+		v.Dimensions[i] = value
 	}
 }
 
 // ToString returns the vector to string
-func (a *VectorN) ToString() string {
+func (v *VectorN) ToString() string {
 	res := "VectorN{ "
-	for _, d := range a.Dimensions {
+	for _, d := range v.Dimensions {
 		res += fmt.Sprintf("%0.2f, ", d)
 	}
 	return res + "}"
 }
 
 // Pow returns the vector pow
-func (a *VectorN) Pow() *VectorN {
+func (v *VectorN) Pow() *VectorN {
 	var copy []float64
-	for _, d := range a.Dimensions {
+	for _, d := range v.Dimensions {
 		copy = append(copy, d*d)
 	}
 	return NewVectorN(copy...)
 }
 
 // Sum returns the sum of all the dimensions of the vector
-func (a *VectorN) Sum() float64 {
+func (v *VectorN) Sum() float64 {
 	res := 0.
-	for _, d := range a.Dimensions {
+	for _, d := range v.Dimensions {
 		res += d
 	}
 	return res
 }
 
 // Norm returns the norm.
-func (a *VectorN) Norm() float64 { return a.Pow().Sum() }
+func (v *VectorN) Norm() float64 { return v.Pow().Sum() }
 
 // Norm2 returns the square of the norm.
-func (a *VectorN) Norm2() float64 { return math.Sqrt(a.Norm()) }
+func (v *VectorN) Norm2() float64 { return math.Sqrt(v.Norm()) }
 
 // Normalize returns a unit vector in the same direction as a.
-func (a *VectorN) Normalize() *VectorN {
-	n2 := a.Norm2()
+func (v *VectorN) Normalize() *VectorN {
+	n2 := v.Norm2()
 	if n2 == 0 {
 		return NewVectorN(0, 0, 0)
 	}
-	return a.Scale(1 / math.Sqrt(n2))
+	return v.Scale(1 / math.Sqrt(n2))
 }
 
 // Abs returns the vector with nonnegative components.
-func (a *VectorN) Abs() *VectorN {
+func (v *VectorN) Abs() *VectorN {
 	var res []float64
-	for _, d := range a.Dimensions {
+	for _, d := range v.Dimensions {
 		res = append(res, math.Abs(d))
 	}
 	return NewVectorN(res...)
 }
 
 // Plus returns the standard vector sum of a and b.
-func (a *VectorN) Plus(b VectorN) *VectorN {
+func (v *VectorN) Plus(b VectorN) *VectorN {
 	var res []float64
-	for i := range a.Dimensions {
-		res = append(res, a.Get(i)+b.Get(i))
+	for i := range v.Dimensions {
+		res = append(res, v.Get(i)+b.Get(i))
 	}
 	return NewVectorN(res...)
 }
 
 // Minus returns the standard vector difference of a and b.
-func (a *VectorN) Minus(b VectorN) *VectorN {
+func (v *VectorN) Minus(b VectorN) *VectorN {
 	var res []float64
-	for i := range a.Dimensions {
-		res = append(res, a.Get(i)-b.Get(i))
+	for i := range v.Dimensions {
+		res = append(res, v.Get(i)-b.Get(i))
 	}
 	return NewVectorN(res...)
 }
 
 // Scale returns the standard scalar product of a and m.
-func (a *VectorN) Scale(m float64) *VectorN {
+func (v *VectorN) Scale(m float64) *VectorN {
 	var res []float64
-	for i := range a.Dimensions {
-		res = append(res, a.Get(i)*m)
+	for i := range v.Dimensions {
+		res = append(res, v.Get(i)*m)
 	}
 	return NewVectorN(res...)
 }
 
 // Div returns the standard scalar division of a and m.
-func (a *VectorN) Div(m float64) *VectorN {
+func (v *VectorN) Div(m float64) *VectorN {
 	if m == 0 {
 		return nil
 	}
-	for i := range a.Dimensions {
-		a.Dimensions[i] /= m
+	for i := range v.Dimensions {
+		v.Dimensions[i] /= m
 	}
-	return a
+	return v
 }
 
 // Dot returns the standard dot product of a and b.
-func (a *VectorN) Dot(b VectorN) float64 {
+func (v *VectorN) Dot(b VectorN) float64 {
 	res := .0
-	for i := range a.Dimensions {
-		res += (a.Get(i) * b.Get(i))
+	for i := range v.Dimensions {
+		res += (v.Get(i) * b.Get(i))
 	}
 	return res
 }
 
 // Cross returns the standard cross product of a and b.
-func (a *VectorN) Cross(b VectorN) *VectorN {
+func (v *VectorN) Cross(b VectorN) *VectorN {
 	// Early error check to prevent redundant cloning
-	if len(a.Dimensions) != 3 || len(b.Dimensions) != 3 {
+	if len(v.Dimensions) != 3 || len(b.Dimensions) != 3 {
 		return nil
 	}
-	res := []float64{a.Get(1)*b.Get(2) - a.Get(2)*b.Get(1),
-		a.Get(2)*b.Get(0) - a.Get(0)*b.Get(2),
-		a.Get(0)*b.Get(1) - a.Get(1)*b.Get(0)}
+	res := []float64{v.Get(1)*b.Get(2) - v.Get(2)*b.Get(1),
+		v.Get(2)*b.Get(0) - v.Get(0)*b.Get(2),
+		v.Get(0)*b.Get(1) - v.Get(1)*b.Get(0)}
 	return NewVectorN(res...)
 }
 
 // Distance returns the Euclidean distance between a and b.
-func (a *VectorN) Distance(b VectorN) float64 { return math.Sqrt(a.Minus(b).Pow().Sum()) }
+func (v *VectorN) Distance(b VectorN) float64 { return math.Sqrt(v.Minus(b).Pow().Sum()) }
 
 // Angle returns the angle between a and b.
-func (a *VectorN) Angle(b VectorN) float64 {
-	cross := a.Cross(b)
+func (v *VectorN) Angle(b VectorN) float64 {
+	cross := v.Cross(b)
 	if cross == nil {
-		return math.Atan2(cross.Norm(), a.Dot(b))
+		return math.Atan2(cross.Norm(), v.Dot(b))
 	}
 	return math.MaxFloat64
 }
@@ -213,10 +213,10 @@ func Max(a VectorN, b VectorN) VectorN {
 }
 
 // Lerp Returns the linear interpolation between two VectorN(s).
-func (a *VectorN) Lerp(b *VectorN, f float64) *VectorN {
+func (v *VectorN) Lerp(b *VectorN, f float64) *VectorN {
 	var res []float64
-	for i := range a.Dimensions {
-		res = append(res, (b.Get(i)-a.Get(i))*f+a.Get(i))
+	for i := range v.Dimensions {
+		res = append(res, (b.Get(i)-v.Get(i))*f+v.Get(i))
 	}
 	return NewVectorN(res...)
 }

@@ -25,10 +25,10 @@ log.Printf("My vector: %s", vector.Get(1)) // 1
 vector.Set(0, 12.6422)
 
 v := NewVectorN(0, 0, 0)
-v.Mul(3.5) // 0,0,0
-v.Add(v) // 0,0,0
+v.Scale(3.5) // 0,0,0
+v.Plus(v) // 0,0,0
 
-a := NewBox(*NewVectorN(0, 0, 0), *NewVectorN(1, 1, 1))
+a := NewBoxMinMax(*NewVectorN(0, 0, 0), *NewVectorN(1, 1, 1))
 b := NewBoxOfSize(*NewVectorN(2, 2, 2), 0.5)
 a.Fit(*b) // False
 ```
@@ -42,7 +42,7 @@ a.Fit(*b) // False
 - [x] ToString
 - [x] Normalization
 - [x] Absolute value
-- [x] Add, Sub, Mul(scalar product), Dot(vector product), Div(scalar division), Cross product, Euclidean Norm, Angle, Lerp
+- [x] Plus, Minus, Scale, Dot(vector product), Div(scalar division), Cross product, Euclidean Norm, Angle, Lerp
 
 ### Volumes
 
@@ -54,9 +54,24 @@ a.Fit(*b) // False
 go test -v github.com/The-Tensox/protometry
 ```
 
+## Benchmarks
+
+```bash
+go test -benchmem -run XXX -bench .
+```
+
+|Name   |   Runs   |   time   |   Bytes   |   Allocs   |
+|:-----:|:--------:|:--------:|:---------:|:----------:|
+|BenchmarkArea_NewBoxMinMax-8   |   1169382   |   1045 ns/op   |   472 B/op  |   13 allocs/op   |
+|BenchmarkArea_NewBoxOfSize-8   |   380234211   |   3.07 ns/op   |   0 B/op   |   0 allocs/op   |
+|BenchmarkArea_Fit-8   |   683202   |   1816 ns/op   |   720 B/op   |   24 allocs/op   |
+|BenchmarkArea_Intersects-8   |   971000   |   1255 ns/op   |   480 B/op   |   16 allocs/op   |
+|BenchmarkArea_Split-8   |   138618   |   9349 ns/op   |   4016 B/op   |   112 allocs/op   |
+
 ## TODO
 
 - [ ] Encoding
 - [ ] Other volumes (sphere, capsule, Convex ...)
-- [ ] Set() for all dimensions at once using lambda
 - [ ] Take inspiration from [numpy](https://numpy.org)
+- [ ] Improve benchmarks
+- [ ] Setup CI for verifying performances (benchmarks)

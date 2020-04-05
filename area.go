@@ -6,33 +6,6 @@ import (
 	"math"
 )
 
-/**
- * https://github.com/vanruesc/sparse-octree/blob/master/src/core/layout.js
- * A binary pattern that describes the standard octant layout:
- *
- * ```text
- *    3____7
- *  2/___6/|
- *  | 1__|_5
- *  0/___4/
- * ```
- *
- * This common layout is crucial for positional assumptions.
- *
- * @type {Uint8Array[]}
- */
-
-var boxLayout = [8][3]int{
-	[3]int{0, 0, 0},
-	[3]int{0, 0, 1},
-	[3]int{0, 1, 0},
-	[3]int{0, 1, 1},
-
-	[3]int{1, 0, 0},
-	[3]int{1, 0, 1},
-	[3]int{1, 1, 0},
-	[3]int{1, 1, 1},
-}
 
 // Area is a 3-d interface representing volumes like Boxes, Spheres, Capsules ...
 type Area interface {
@@ -135,9 +108,7 @@ func (v *VectorN) In(box Box) bool {
 
 // Fit Returns whether the specified area is fully contained in the other area.
 func (b *Box) Fit(o Box) bool {
-	bm := b.GetMin()
-	bmm := b.GetMax()
-	return bm.In(o) && bmm.In(o)
+	return b.Center.Plus(b.Extents).In(o) && b.Center.Minus(b.Extents).In(o)
 }
 
 // Intersects Returns whether any portion of this area intersects with the specified area or reversely.
@@ -154,59 +125,61 @@ func (b *Box) Intersects(bb Box) bool {
 	return true
 }
 
+/**
+ * https://github.com/vanruesc/sparse-octree/blob/master/src/core/layout.js
+ * A binary pattern that describes the standard octant layout:
+ *
+ * ```text
+ *    3____7
+ *  2/___6/|
+ *  | 1__|_5
+ *  0/___4/
+ * ```
+ *
+ * This common layout is crucial for positional assumptions.
+ *
+ * @type {Uint8Array[]}
+ */
+
+var boxLayout = [8][3]int{
+	[3]int{0, 0, 0},
+	[3]int{0, 0, 1},
+	[3]int{0, 1, 0},
+	[3]int{0, 1, 1},
+
+	[3]int{1, 0, 0},
+	[3]int{1, 0, 1},
+	[3]int{1, 1, 0},
+	[3]int{1, 1, 1},
+}
+
 // Split split a box into sub boxes
 func (b *Box) Split() [8]*Box {
-	// center := b.Center
-	// halfSize := b.Extents.Get(0) * .5 // Assume cube
-	//var split [8]*Box
-	// for i := 0; i < 8; i++ {
-	// 	combination := boxLayout[i]
-	// 	split[i] = &Box{Extents: *b.Extents.Scale(0.5)}
-	// 	split[i] = NewBoxOfSize(NewVectorN(halfSize.Scale(combination[j]).Plus(center.Get(j))), halfSize)
-	// }
-	//return split
+	/*
+	min := b.GetMin()
+	center := b.Center
+	size := b.Extents.Get(0) // Assume cube
+	var split [8]*Box
+	for i := 0; i < 8; i++ {
+		combination := boxLayout[i]
+		var dims []float64
+		dims = make([]float64, 3)
+		for j := range combination {
+			if combination[j] == 0 {
+				dims[j] = min.Get(j)
+			} else {
+				dims[j] = center.Get(j)
+			}
+		}
 
-	// var split [8]*Box
-	// n := b.Extents.Scale(0.5)
-	// for i := 0; i < 8; i++ {
-	// 	split[i] = NewBoxMinMax(
-	// 		b.Center.Get(0)-n.Get(0),
-	// 		b.Center.Get(1)-n.Get(1),
-	// 		b.Center.Get(2)-n.Get(2),
-	// 		b.Center.Get(0)+n.Get(0),
-	// 		b.Center.Get(1)+n.Get(1),
-	// 		b.Center.Get(2)+n.Get(2),
-	// 	)
-	// }
-	// return split
-	// min := b.GetMin()
-	// center := b.Center
-	// halfSize := b.Extents.Get(0) / 2 // Assume cube
-	// var split [8]*Box
-	// var x, y, z float64
-	// for i := 0; i < 8; i++ {
-	// 	combination := boxLayout[i]
-	// 	if combination[0] == 0 {
-	// 		x = min.Get(0)
-	// 	} else {
-	// 		x = center.Get(0)
-	// 	}
-	// 	if combination[1] == 0 {
-	// 		y = min.Get(1)
-	// 	} else {
-	// 		y = center.Get(1)
-	// 	}
-	// 	if combination[2] == 0 {
-	// 		z = min.Get(2)
-	// 	} else {
-	// 		z = center.Get(2)
-	// 	}
-	// 	split[i] = NewBoxOfSize(*NewVectorN(x, y, z), halfSize)
-	// }
-	// return split
-
+		split[i] = NewBoxOfSize(*NewVectorN(dims...), size)
+	}
+	return split
+	*/
 	bm := b.GetMin()
+	bm = *bm.Scale(2)
 	bmm := b.GetMax()
+	bmm = *bmm.Scale(2)
 	return [8]*Box{
 		NewBoxMinMax(
 			b.Center.Get(0), b.Center.Get(1), b.Center.Get(2),
@@ -241,19 +214,6 @@ func (b *Box) Split() [8]*Box {
 			bmm.Get(0), b.Center.Get(1), b.Center.Get(2),
 		),
 	}
-	// quarter := b.Extents.Get(0) / 2 // Assuming cube
-	// newLength := b.Extents.Get(0)
-	// return [8]*Box{
-	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, quarter, quarter)), newLength),
-	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, quarter, quarter)), newLength),
-	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, -quarter, quarter)), newLength),
-	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, -quarter, quarter)), newLength),
-	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(quarter, quarter, -quarter)), newLength),
-	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, quarter, quarter)), newLength),
-	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, -quarter, -quarter)), newLength),
-	// 	NewBoxOfSize(*b.Center.Plus(*NewVectorN(-quarter, quarter, -quarter)), newLength),
-	// }
-
 }
 
 // MinimumTranslation tells how much an entity has to move to no longer overlap another entity.
