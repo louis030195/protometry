@@ -102,6 +102,12 @@ func TestVectorN_Distance(t *testing.T) {
 			args:   args{b: *NewVectorN(1, 0, 0)},
 			want:   1,
 		},
+        {
+            fields: fields{Dimensions: NewVectorN(0, 0, 0).Dimensions},
+            args:   args{b: *NewVectorN(10, 0, 0)},
+            want:   10,
+        },
+
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -407,4 +413,90 @@ func TestVectorN_Clone(t *testing.T) {
 	Equals(t, 27., a.Dimensions[0])
 	t.Logf("B: %v", b.ToString())
 	Equals(t, 12., b.Dimensions[0])
+}
+
+func TestVectorN_Div(t *testing.T) {
+	type fields struct {
+		Dimensions           []float64
+		XXX_NoUnkeyedLiteral struct{}
+		XXX_unrecognized     []byte
+		XXX_sizecache        int32
+	}
+	type args struct {
+		m float64
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *VectorN
+	}{
+		// TODO: Add test cases.
+		{
+			fields: fields{Dimensions: []float64{2, 2, 2, 2}},
+			args: args{2},
+			want: NewVectorN(1, 1, 1, 1),
+		},
+		{
+			fields: fields{Dimensions: []float64{2, 2, 2, 2}},
+			args: args{2},
+			want: NewVectorN(1, 1, 1, 1),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := &VectorN{
+				Dimensions:           tt.fields.Dimensions,
+				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
+				XXX_unrecognized:     tt.fields.XXX_unrecognized,
+				XXX_sizecache:        tt.fields.XXX_sizecache,
+			}
+			if got := v.Div(tt.args.m); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Div() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestVectorN_Equal(t *testing.T) {
+	type fields struct {
+		Dimensions           []float64
+		XXX_NoUnkeyedLiteral struct{}
+		XXX_unrecognized     []byte
+		XXX_sizecache        int32
+	}
+	type args struct {
+		b VectorN
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   bool
+	}{
+		// TODO: Add test cases.
+		{
+			fields: fields{Dimensions: []float64{1, 2, 3, 4, 5}},
+			args: args{b:*NewVectorN(1, 2, 3, 4, 5)},
+			want: true,
+		},
+		{
+			fields: fields{Dimensions: []float64{2, 2, 3, 4, 5}},
+			args: args{b:*NewVectorN(1, 2, 3, 4, 5)},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			v := &VectorN{
+				Dimensions:           tt.fields.Dimensions,
+				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
+				XXX_unrecognized:     tt.fields.XXX_unrecognized,
+				XXX_sizecache:        tt.fields.XXX_sizecache,
+			}
+			if got := v.Equal(tt.args.b); got != tt.want {
+				t.Errorf("Equal() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

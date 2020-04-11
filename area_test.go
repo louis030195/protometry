@@ -484,21 +484,72 @@ func TestBox_Intersects(t *testing.T) {
 }
 
 func TestBox_Split(t *testing.T) {
-	b := Box{}
-	b.SetMinMax(*NewVector3Zero(), *NewVectorN(1, 1, 1))
-	Equals(t, *NewBoxOfSize(*NewVectorN(0.5, 0.5, 0.5), 1), b)
-	Equals(t, *NewBoxMinMax(0, 0, 0, 1, 1, 1), b)
-	want := [8]*Box{
-		NewBoxMinMax(0.5, 0.5, 0.5, 1, 1, 1),
-		NewBoxMinMax(0, 0.5, 0.5, 0.5, 1, 1),
-		NewBoxMinMax(0, 0, 0.5, 0.5, 0.5, 1),
-		NewBoxMinMax(0.5, 0, 0.5, 1, 0.5, 1),
-		NewBoxMinMax(0.5, 0.5, 0, 1, 1, 0.5),
-		NewBoxMinMax(0, 0.5, 0, 0.5, 1, 0.5),
-		NewBoxMinMax(0, 0, 0, 0.5, 0.5, 0.5),
-		NewBoxMinMax(0.5, 0, 0, 1, 0.5, 0.5),
+	/*
+		What we want to achieve (in 2D):
+		 _ _ _ _
+		|		|
+		|_ _ _ _|
+
+		->
+		 _ _ _ _
+		|_ _|_ _|
+		|_ _|_ _|
+
+	 */
+
+	/*
+		Representation (ignoring the Z axis cause it's hard to draw in 3D ;))
+			centered at 0.5,0.5,0.5
+			0.5,0.5,0.5 extent (cubic)
+			--->
+		 _ _ _ _
+		|		|
+		|_ _ _ _|
+
+		------->
+		1 size
+		min 0,0,0
+		max 0,0,0
+
+		So in theory the split-ed box would be
+
+		Each sub-box extent: 0.25
+		 ->
+		 _ _ _ _
+		|_A_|_B_|
+		|_D_|_C_|
+
+		--->
+		Each sub-box size: 0.5
+		A sub-box:
+		center: 0.25,0.75,0.25
+		min: 0,0.5,0
+		max: 0.5,1,0.5
+		...
+	 */
+	b := Box{
+		Center: VectorN{
+			Dimensions: []float64{0.5, 0.5, 0.5},
+		},
+		Extents: VectorN{
+			Dimensions:[]float64{0.5, 0.5, 0.5},
+		},
 	}
 	got := b.Split()
+
+	childExtents := *b.Extents.Scale(0.5)
+	want := [8]*Box{
+		{Center: VectorN{Dimensions: []float64{0.25, 0.75, 0.25}}, Extents: childExtents},
+		{Center: VectorN{Dimensions: []float64{0.75, 0.75, 0.25}}, Extents:childExtents},
+		{Center: VectorN{Dimensions: []float64{0.25, 0.75, 0.75}}, Extents: childExtents},
+		{Center: VectorN{Dimensions: []float64{0.75, 0.75, 0.75}}, Extents: childExtents},
+
+		{Center: VectorN{Dimensions: []float64{0.25, 0.25, 0.25}}, Extents: childExtents},
+		{Center: VectorN{Dimensions: []float64{0.75, 0.25, 0.25}}, Extents: childExtents},
+		{Center: VectorN{Dimensions: []float64{0.25, 0.25, 0.75}}, Extents: childExtents},
+		{Center: VectorN{Dimensions: []float64{0.75, 0.25, 0.75}}, Extents: childExtents},
+	}
+
 	tester := func(got, want [8]*Box) {
 		t.Logf("\nBefore split \n%v", b.ToString())
 		for i := range want {
@@ -512,23 +563,10 @@ func TestBox_Split(t *testing.T) {
 				got[i].Extents,
 				want[i].Extents,
 			)
-			//Equals(t, want[i].Center, got[i].Center)
-			//Equals(t, want[i].Extents, got[i].Extents)
+			Equals(t, want[i].Center, got[i].Center)
+			Equals(t, want[i].Extents, got[i].Extents)
 		}
 	}
-	tester(got, want)
-	b = *NewBoxMinMax(-5, -5, -5, 5, 5, 5)
-	want = [8]*Box{
-		NewBoxMinMax(0, 0, 0, 5, 5, 5),
-		NewBoxMinMax(-5, 0, 0, 0, 5, 5),
-		NewBoxMinMax(-5, -5, 0, 0, 0, 5),
-		NewBoxMinMax(0, -5, 0, 5, 0, 5),
-		NewBoxMinMax(0, 0, -5, 5, 5, 0),
-		NewBoxMinMax(-5, 0, -5, 0, 5, 0),
-		NewBoxMinMax(-5, -5, -5, 0, 0, 0),
-		NewBoxMinMax(0, -5, -5, 5, 0, 0),
-	}
-	got = b.Split()
 	tester(got, want)
 }
 

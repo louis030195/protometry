@@ -125,94 +125,21 @@ func (b *Box) Intersects(bb Box) bool {
 	return true
 }
 
-/**
- * https://github.com/vanruesc/sparse-octree/blob/master/src/core/layout.js
- * A binary pattern that describes the standard octant layout:
- *
- * ```text
- *    3____7
- *  2/___6/|
- *  | 1__|_5
- *  0/___4/
- * ```
- *
- * This common layout is crucial for positional assumptions.
- *
- * @type {Uint8Array[]}
- */
 
-var boxLayout = [8][3]int{
-	[3]int{0, 0, 0},
-	[3]int{0, 0, 1},
-	[3]int{0, 1, 0},
-	[3]int{0, 1, 1},
-
-	[3]int{1, 0, 0},
-	[3]int{1, 0, 1},
-	[3]int{1, 1, 0},
-	[3]int{1, 1, 1},
-}
-
-// Split split a box into sub boxes
+// Split split a CUBE into sub-cubes
 func (b *Box) Split() [8]*Box {
-	/*
-	min := b.GetMin()
-	center := b.Center
-	size := b.Extents.Get(0) // Assume cube
-	var split [8]*Box
-	for i := 0; i < 8; i++ {
-		combination := boxLayout[i]
-		var dims []float64
-		dims = make([]float64, 3)
-		for j := range combination {
-			if combination[j] == 0 {
-				dims[j] = min.Get(j)
-			} else {
-				dims[j] = center.Get(j)
-			}
-		}
-
-		split[i] = NewBoxOfSize(*NewVectorN(dims...), size)
-	}
-	return split
-	*/
-	bm := b.GetMin()
-	bm = *bm.Scale(2)
-	bmm := b.GetMax()
-	bmm = *bmm.Scale(2)
+	q := b.Extents.Get(0) / 2
+	newExtents := *b.Extents.Scale(0.5)
 	return [8]*Box{
-		NewBoxMinMax(
-			b.Center.Get(0), b.Center.Get(1), b.Center.Get(2),
-			bmm.Get(0), bmm.Get(1), bmm.Get(2),
-		),
-		NewBoxMinMax(
-			bm.Get(0), b.Center.Get(1), b.Center.Get(2),
-			b.Center.Get(0), bmm.Get(1), bmm.Get(2),
-		),
-		NewBoxMinMax(
-			bm.Get(0), bm.Get(1), b.Center.Get(2),
-			b.Center.Get(0), b.Center.Get(1), bmm.Get(2),
-		),
-		NewBoxMinMax(
-			b.Center.Get(0), bm.Get(1), b.Center.Get(2),
-			bmm.Get(0), b.Center.Get(1), bmm.Get(2),
-		),
-		NewBoxMinMax(
-			b.Center.Get(0), b.Center.Get(1), bm.Get(2),
-			bmm.Get(0), bmm.Get(1), b.Center.Get(2),
-		),
-		NewBoxMinMax(
-			bm.Get(0), b.Center.Get(1), bm.Get(2),
-			b.Center.Get(0), bmm.Get(1), b.Center.Get(2),
-		),
-		NewBoxMinMax(
-			bm.Get(0), bm.Get(1), bm.Get(2),
-			b.Center.Get(0), b.Center.Get(1), b.Center.Get(2),
-		),
-		NewBoxMinMax(
-			b.Center.Get(0), bm.Get(1), bm.Get(2),
-			bmm.Get(0), b.Center.Get(1), b.Center.Get(2),
-		),
+		{Center: *b.Center.Plus(*NewVectorN(-q, q, -q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(q, q, -q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(-q, q, q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(q, q, q)), Extents: newExtents},
+
+		{Center: *b.Center.Plus(*NewVectorN(-q, -q, -q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(q, -q, -q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(-q, -q, q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(q, -q, q)), Extents: newExtents},
 	}
 }
 

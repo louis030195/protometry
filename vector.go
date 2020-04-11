@@ -73,8 +73,8 @@ func (v *VectorN) SetAll(value float64) {
 // ToString returns the vector to string
 func (v *VectorN) ToString() string {
 	res := "VectorN{ "
-	for _, d := range v.Dimensions {
-		res += fmt.Sprintf("%0.2f, ", d)
+	for i := range v.Dimensions {
+		res += fmt.Sprintf("%0.2f, ", v.Get(i))
 	}
 	return res + "}"
 }
@@ -82,8 +82,8 @@ func (v *VectorN) ToString() string {
 // Pow returns the vector pow
 func (v *VectorN) Pow() *VectorN {
 	var copy []float64
-	for _, d := range v.Dimensions {
-		copy = append(copy, d*d)
+	for i := range v.Dimensions {
+		copy = append(copy, v.Get(i)*v.Get(i))
 	}
 	return NewVectorN(copy...)
 }
@@ -91,8 +91,8 @@ func (v *VectorN) Pow() *VectorN {
 // Sum returns the sum of all the dimensions of the vector
 func (v *VectorN) Sum() float64 {
 	res := 0.
-	for _, d := range v.Dimensions {
-		res += d
+	for i := range v.Dimensions {
+		res += v.Get(i)
 	}
 	return res
 }
@@ -153,10 +153,13 @@ func (v *VectorN) Div(m float64) *VectorN {
 	if m == 0 {
 		return nil
 	}
-	for i := range v.Dimensions {
-		v.Dimensions[i] /= m
-	}
-	return v
+     
+    var res []float64
+    for i := range v.Dimensions {
+        res = append(res, v.Get(i)/m)
+    }
+
+    return NewVectorN(res...)
 }
 
 // Dot returns the standard dot product of a and b.

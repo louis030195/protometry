@@ -75,3 +75,4 @@ go test -benchmem -run XXX -bench .
 - [ ] Take inspiration from [numpy](https://numpy.org)
 - [ ] Improve benchmarks
 - [ ] Setup CI for verifying performances (benchmarks)
+- [ ] Implement uncovered test cases
