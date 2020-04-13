@@ -10,8 +10,8 @@ func NewQuaternion(x, y, z, w float64) *QuaternionN {
 }
 
 // LookAt return a quaternion corresponding to the rotation required to look at the other Vector3
-func (a *VectorN) LookAt(b VectorN) *QuaternionN {
-	angle := a.Angle(b)
+func (v *VectorN) LookAt(b VectorN) *QuaternionN {
+	angle := v.Angle(b)
 	if angle == math.MaxFloat64 {
 		return nil
 	}

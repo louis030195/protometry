@@ -6,19 +6,6 @@ import (
 	"math"
 )
 
-// In Returns whether the specified point is contained in this box.
-func (a *VectorN) In(box Box) bool {
-	if len(a.Dimensions) != len(box.min.Dimensions) {
-		return false
-	}
-
-	for i := range a.Dimensions {
-		if box.min.Get(i) > a.Get(i) || box.max.Get(i) < a.Get(i) {
-			return false
-		}
-	}
-	return true
-}
 
 // Area is a 3-d interface representing volumes like Boxes, Spheres, Capsules ...
 type Area interface {
@@ -38,108 +25,137 @@ type Capsule struct {
 type Convex struct {
 }
 
-// Box ...
+// Box is an AABB volume
 type Box struct {
-	min VectorN
-	max VectorN
+	Center  VectorN
+	// Extents represents half of the box length for every axis
+	Extents VectorN
+}
+
+// NewBoxMinMax returns a new box using min max
+func NewBoxMinMax(dims ...float64) *Box {
+	b := &Box{}
+	b.SetMinMax(*NewVectorN(dims[0:3]...), *NewVectorN(dims[3:6]...))
+	return b
+}
+
+// NewBoxOfSize returns a box of size centered at center
+func NewBoxOfSize(center VectorN, size float64) *Box {
+	return &Box{
+		Center:  center,
+		Extents: *NewVectorN(size/2, size/2, size/2),
+	}
 }
 
 // Equal returns whether a box is equal to another
 func (b *Box) Equal(other Box) bool {
-	return b.min.Equal(other.min) && b.max.Equal(other.max)
+	return b.Center.Equal(other.Center) && b.Extents.Equal(other.Extents)
 }
 
 // GetMin ...
 func (b *Box) GetMin() VectorN {
-	return b.min
+	return *b.Center.Minus(b.Extents)
 }
 
 // GetMax ...
 func (b *Box) GetMax() VectorN {
-	return b.max
+	return *b.Center.Plus(b.Extents)
 }
 
 // GetSize returns the size of the box
-func (b *Box) GetSize() float64 {
-	return math.Abs(b.max.Distance(b.min))
+func (b *Box) GetSize() VectorN {
+	return *b.Extents.Scale(2)
 }
 
-// NewBox constructs and returns a new box
-func NewBox(dims ...float64) *Box {
-	if len(dims) != 6 {
-		return nil
-	}
-	return &Box{
-		min: Min(*NewVectorN(dims[0:3]...), *NewVectorN(dims[3:6]...)),
-		max: Max(*NewVectorN(dims[0:3]...), *NewVectorN(dims[3:6]...)),
-	}
+// SetMinMax sets the box to the /min/ and /max/ value of the box.
+func (b *Box) SetMinMax(min, max VectorN) {
+	b.Extents = *(max.Minus(min)).Scale(0.5)
+	b.Center = *min.Plus(b.Extents)
 }
 
-// NewBoxOfSize returns a box of size centered at position
-func NewBoxOfSize(position VectorN, size float64) *Box {
-	return &Box{
-		min: *position.Sub(*NewVectorN(size, size, size)),
-		max: *position.Add(*NewVectorN(size, size, size)),
-	}
+// EncapsulatePoint grows the box to include the /point/.
+func (b *Box) EncapsulatePoint(point VectorN) {
+	b.SetMinMax(Min(b.GetMin(), point), Max(b.GetMax(), point))
 }
 
-// Fit Returns whether the specified area is fully contained in the other area.
-func (b *Box) Fit(o Box) bool {
-	return b.min.In(o) && b.max.In(o)
+// EncapsulateBox grows the box to include the /box/.
+func (b *Box) EncapsulateBox(box Box) {
+	b.EncapsulatePoint(*box.Center.Minus(box.Extents))
+	b.EncapsulatePoint(*box.Center.Plus(box.Extents))
 }
 
-// Intersects Returns whether any portion of this area intersects with the specified area or reversely.
-func (b *Box) Intersects(o Box) bool {
-	if len(b.min.Dimensions) != len(o.min.Dimensions) {
-		return false
-	}
-	for i := range b.min.Dimensions {
-		if b.max.Get(i) < o.min.Get(i) || o.max.Get(i) < b.min.Get(i) {
+// Expand the box by increasing its /size/ by /amount/ along each side.
+func (b *Box) Expand(amount float64) {
+	amount *= .5
+	b.Extents = *b.Extents.Plus(*NewVectorN(amount, amount, amount))
+}
+
+// ExpandV the box by increasing its /size/ by /amount/ along each side.
+func (b *Box) ExpandV(amount VectorN) {
+	b.Extents = *b.Extents.Plus(*amount.Scale(.5))
+}
+
+// In Returns whether the specified point is contained in this box.
+func (v *VectorN) In(box Box) bool {
+	bm := box.GetMin()
+	bmm := box.GetMax()
+	for i := range v.Dimensions {
+		if bm.Get(i) > v.Get(i) || bmm.Get(i) < v.Get(i) {
 			return false
 		}
 	}
 	return true
 }
 
-// MakeSubBoxes split a box into subAreas
-// TODO: not sure if it's correct, MAKE TEST
-func (b *Box) MakeSubBoxes() [8]*Box {
-	// gets the child boxes (octants) of the box.
-	center := b.min.Lerp(&b.max, 0.5)
+// Fit Returns whether the specified area is fully contained in the other area.
+func (b *Box) Fit(o Box) bool {
+	return b.Center.Plus(b.Extents).In(o) && b.Center.Minus(b.Extents).In(o)
+}
 
+// Intersects Returns whether any portion of this area intersects with the specified area or reversely.
+func (b *Box) Intersects(bb Box) bool {
+	bm := b.GetMin()
+	bmm := b.GetMax()
+	bbm := bb.GetMin()
+	bbmm := bb.GetMax()
+	for i := range bm.Dimensions {
+		if bmm.Get(i) < bbm.Get(i) || bbmm.Get(i) < bm.Get(i) {
+			return false
+		}
+	}
+	return true
+}
+
+
+// Split split a CUBE into sub-cubes
+func (b *Box) Split() [8]*Box {
+	q := b.Extents.Get(0) / 2
+	newExtents := *b.Extents.Scale(0.5)
 	return [8]*Box{
-		NewBox(b.max.Get(0), b.max.Get(1), b.max.Get(2),
-			center.Get(0), center.Get(1), center.Get(2)),
-		NewBox(center.Get(0), b.max.Get(1), b.max.Get(2),
-			b.min.Get(0), center.Get(1), center.Get(2)),
-		NewBox(center.Get(0), center.Get(1), b.max.Get(2),
-			b.min.Get(0), b.min.Get(1), center.Get(2)),
-		NewBox(b.max.Get(0), center.Get(1), b.max.Get(2),
-			center.Get(0), b.min.Get(1), center.Get(2)),
-		NewBox(b.max.Get(0), b.max.Get(1), center.Get(2),
-			center.Get(0), center.Get(1), b.min.Get(2)),
-		NewBox(center.Get(0), b.max.Get(1), center.Get(2),
-			b.min.Get(0), center.Get(1), b.min.Get(2)),
-		NewBox(center.Get(0), center.Get(1), center.Get(2),
-			b.min.Get(0), b.min.Get(1), b.min.Get(2)),
-		NewBox(b.max.Get(0), center.Get(1), center.Get(2),
-			center.Get(0), b.min.Get(1), b.min.Get(2)),
+		{Center: *b.Center.Plus(*NewVectorN(-q, q, -q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(q, q, -q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(-q, q, q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(q, q, q)), Extents: newExtents},
+
+		{Center: *b.Center.Plus(*NewVectorN(-q, -q, -q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(q, -q, -q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(-q, -q, q)), Extents: newExtents},
+		{Center: *b.Center.Plus(*NewVectorN(q, -q, q)), Extents: newExtents},
 	}
 }
 
-func (b *Box) GetCenter() *VectorN {
-	return b.min.Lerp(&b.max, 0.5)
-}
-
 // MinimumTranslation tells how much an entity has to move to no longer overlap another entity.
-// TODO: 3D
-func MinimumTranslation(a, b Box) VectorN {
+// FIXME ? 3D ? 2D ?
+func MinimumTranslation(b, bb Box) VectorN {
 	mtd := VectorN{}
-
-	left := b.min.Get(0) - a.max.Get(0)
-	right := b.max.Get(0) - a.min.Get(0)
-	top := b.min.Get(1) - a.max.Get(1)
-	bottom := b.max.Get(1) - a.min.Get(1)
+	bm := b.GetMin()
+	bmm := b.GetMax()
+	bbm := bb.GetMin()
+	bbmm := bb.GetMax()
+	left := bm.Get(0) - bbmm.Get(0)
+	right := bmm.Get(0) - bbm.Get(0)
+	top := bm.Get(1) - bbmm.Get(1)
+	bottom := bmm.Get(1) - bbm.Get(1)
 
 	if left > 0 || right < 0 {
 		log.Println("Box aint intercepting")
@@ -173,7 +189,10 @@ func MinimumTranslation(a, b Box) VectorN {
 	return mtd
 }
 
-// ToString returns a human-readable representation of the box
-func (b *Box) ToString() string {
-	return fmt.Sprintf("min: %v, max: %v", b.min.ToString(), b.max.ToString())
+// String returns a human-readable representation of the box
+func (b *Box) String() string {
+	bm := b.GetMin()
+	bmm := b.GetMax()
+	return fmt.Sprintf("Center: %v, \nExtents: %v, \nmin %v, \nmax %v",
+		b.Center.String(), b.Extents.String(), bm.String(), bmm.String())
 }

@@ -14,3 +14,9 @@ build
 
 # Protobuf
 # *.pb.go
+
+# VScode
+.vscode
+
+# Idea
+.idea

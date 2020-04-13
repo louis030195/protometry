@@ -27,34 +27,34 @@ type VectorN struct {
 	XXX_sizecache        int32     `json:"-"`
 }
 
-func (m *VectorN) Reset()         { *m = VectorN{} }
-func (m *VectorN) String() string { return proto.CompactTextString(m) }
+func (v *VectorN) Reset()         { *v = VectorN{} }
+func (v *VectorN) String() string { return proto.CompactTextString(v) }
 func (*VectorN) ProtoMessage()    {}
 func (*VectorN) Descriptor() ([]byte, []int) {
 	return fileDescriptor_c38cd87c3fa235d4, []int{0}
 }
 
-func (m *VectorN) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_VectorN.Unmarshal(m, b)
+func (v *VectorN) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_VectorN.Unmarshal(v, b)
 }
-func (m *VectorN) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_VectorN.Marshal(b, m, deterministic)
+func (v *VectorN) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_VectorN.Marshal(b, v, deterministic)
 }
-func (m *VectorN) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_VectorN.Merge(m, src)
+func (v *VectorN) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_VectorN.Merge(v, src)
 }
-func (m *VectorN) XXX_Size() int {
-	return xxx_messageInfo_VectorN.Size(m)
+func (v *VectorN) XXX_Size() int {
+	return xxx_messageInfo_VectorN.Size(v)
 }
-func (m *VectorN) XXX_DiscardUnknown() {
-	xxx_messageInfo_VectorN.DiscardUnknown(m)
+func (v *VectorN) XXX_DiscardUnknown() {
+	xxx_messageInfo_VectorN.DiscardUnknown(v)
 }
 
 var xxx_messageInfo_VectorN proto.InternalMessageInfo
 
-func (m *VectorN) GetDimensions() []float64 {
-	if m != nil {
-		return m.Dimensions
+func (v *VectorN) GetDimensions() []float64 {
+	if v != nil {
+		return v.Dimensions
 	}
 	return nil
 }
