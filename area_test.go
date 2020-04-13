@@ -130,7 +130,7 @@ func TestBox_Equal(t *testing.T) {
 				Extents: tt.fields.Extents,
 			}
 			if got := b.Equal(tt.args.other); got != tt.want {
-				t.Errorf("Box.Equal() = %v, want %v\nb: %v\nother:% v", got, tt.want, b.ToString(), tt.args.other.ToString())
+				t.Errorf("Box.Equal() = %v, want %v\nb: %v\nother:% v", got, tt.want, b, tt.args.other)
 			}
 		})
 	}
@@ -551,7 +551,7 @@ func TestBox_Split(t *testing.T) {
 	}
 
 	tester := func(got, want [8]*Box) {
-		t.Logf("\nBefore split \n%v", b.ToString())
+		t.Logf("\nBefore split \n%v", b)
 		for i := range want {
 			t.Logf("\nMin%v\nWant%v\n\nMax%v\nWant%v\n\nCenter%v\nWant%v\n\nExtents%v\nWant%v\n",
 				got[i].GetMin(),

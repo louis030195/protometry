@@ -6,6 +6,10 @@
 
 Geometry on protobuf stubs, could be also implemented in other languages.
 
+## Why developing another Math library instead of using existing ones ?
+
+This library is targeting protobuf types especially, allowing to do math directly on networked data.
+
 ## Installation
 
 ```bash
@@ -39,7 +43,6 @@ a.Fit(*b) // False
 
 - [x] Build vectors of N dimensions
 - [x] Vector comparison (min, max, equal)
-- [x] ToString
 - [x] Normalization
 - [x] Absolute value
 - [x] Plus, Minus, Scale, Dot(vector product), Div(scalar division), Cross product, Euclidean Norm, Angle, Lerp

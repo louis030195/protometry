@@ -25,9 +25,10 @@ type Capsule struct {
 type Convex struct {
 }
 
-// Box ...
+// Box is an AABB volume
 type Box struct {
 	Center  VectorN
+	// Extents represents half of the box length for every axis
 	Extents VectorN
 }
 
@@ -188,10 +189,10 @@ func MinimumTranslation(b, bb Box) VectorN {
 	return mtd
 }
 
-// ToString returns a human-readable representation of the box
-func (b *Box) ToString() string {
+// String returns a human-readable representation of the box
+func (b *Box) String() string {
 	bm := b.GetMin()
 	bmm := b.GetMax()
 	return fmt.Sprintf("Center: %v, \nExtents: %v, \nmin %v, \nmax %v",
-		b.Center.ToString(), b.Extents.ToString(), bm.ToString(), bmm.ToString())
+		b.Center.String(), b.Extents.String(), bm.String(), bmm.String())
 }

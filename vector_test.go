@@ -411,7 +411,7 @@ func TestVectorN_Clone(t *testing.T) {
 	b := a.Clone()
 	a.Dimensions[0] = 27
 	Equals(t, 27., a.Dimensions[0])
-	t.Logf("B: %v", b.ToString())
+	t.Logf("B: %v", b)
 	Equals(t, 12., b.Dimensions[0])
 }
 

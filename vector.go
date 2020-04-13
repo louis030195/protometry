@@ -1,7 +1,6 @@
 package protometry
 
 import (
-	"fmt"
 	"math"
 	"math/rand"
 )
@@ -70,22 +69,13 @@ func (v *VectorN) SetAll(value float64) {
 	}
 }
 
-// ToString returns the vector to string
-func (v *VectorN) ToString() string {
-	res := "VectorN{ "
-	for i := range v.Dimensions {
-		res += fmt.Sprintf("%0.2f, ", v.Get(i))
-	}
-	return res + "}"
-}
-
 // Pow returns the vector pow
 func (v *VectorN) Pow() *VectorN {
-	var copy []float64
+	var res []float64
 	for i := range v.Dimensions {
-		copy = append(copy, v.Get(i)*v.Get(i))
+		res = append(res, v.Get(i)*v.Get(i))
 	}
-	return NewVectorN(copy...)
+	return NewVectorN(res...)
 }
 
 // Sum returns the sum of all the dimensions of the vector
@@ -151,7 +141,7 @@ func (v *VectorN) Scale(m float64) *VectorN {
 // Div returns the standard scalar division of a and m.
 func (v *VectorN) Div(m float64) *VectorN {
 	if m == 0 {
-		return nil
+		return v
 	}
      
     var res []float64
