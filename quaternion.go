@@ -4,22 +4,14 @@ import (
 	"math"
 )
 
-// NewQuaternion constructs a VectorN
-func NewQuaternion(x, y, z, w float64) *QuaternionN {
-	return &QuaternionN{Value: &VectorN{Dimensions: []float64{x, y, z, w}}}
+// NewQuaternion constructs a Vector3
+func NewQuaternion(x, y, z, w float64) *Quaternion {
+	return &Quaternion{X: x, Y: y, Z: z, W: w}
 }
 
-// LookAt return a quaternion corresponding to the rotation required to look at the other Vector3
-func (v *VectorN) LookAt(b VectorN) *QuaternionN {
-	angle := v.Angle(b)
-	if angle == math.MaxFloat64 {
-		return nil
-	}
-	return NewQuaternion(0, angle, 0, angle)
-}
 
 // ToQuaternion ... yaw (Z), pitch (Y), roll (X)
-func ToQuaternion(yaw, pitch, roll float64) *QuaternionN {
+func ToQuaternion(yaw, pitch, roll float64) *Quaternion {
 	// Abbreviations for the various angular functions
 	cy := math.Cos(yaw * 0.5)
 	sy := math.Sin(yaw * 0.5)

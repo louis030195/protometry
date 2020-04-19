@@ -15,7 +15,7 @@ func TestNewQuaternion(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want *QuaternionN
+		want *Quaternion
 	}{
 		// TODO: Add test cases.
 	}

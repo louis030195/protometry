@@ -28,12 +28,12 @@ vector := NewVector3One() // 1,1,1
 log.Printf("My vector: %s", vector.Get(1)) // 1
 vector.Set(0, 12.6422)
 
-v := NewVectorN(0, 0, 0)
+v := NewVector3(0, 0, 0)
 v.Scale(3.5) // 0,0,0
 v.Plus(v) // 0,0,0
 
-a := NewBoxMinMax(*NewVectorN(0, 0, 0), *NewVectorN(1, 1, 1))
-b := NewBoxOfSize(*NewVectorN(2, 2, 2), 0.5)
+a := NewBoxMinMax(*NewVector3(0, 0, 0), *NewVector3(1, 1, 1))
+b := NewBoxOfSize(*NewVector3(2, 2, 2), 0.5)
 a.Fit(*b) // False
 ```
 
@@ -75,7 +75,7 @@ go test -benchmem -run XXX -bench .
 
 - [ ] Encoding
 - [ ] Handle other volumes (sphere, capsule, mesh ...) and make them follow [an interface](./volumen.go)
-- [ ] Take inspiration from [numpy](https://numpy.org)
+- [ ] Take inspiration from [numpy](https://docs.scipy.org/doc/numpy/reference/routines.math.html#arithmetic-operations)
 - [ ] Improve benchmarks
 - [ ] Setup CI for verifying performances (benchmarks)
 - [ ] Implement uncovered test cases

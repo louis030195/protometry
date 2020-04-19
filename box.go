@@ -7,129 +7,85 @@ import (
 
 
 // NewBoxMinMax returns a new box using min max
-func NewBoxMinMax(dims ...float64) *Box {
-	b := &Box{}
-	b.SetMinMax(*NewVectorN(dims[0:3]...), *NewVectorN(dims[3:6]...))
-	return b
+func NewBoxMinMax(minX, minY, minZ, maxX, maxY, maxZ float64) *Box {
+	return &Box{
+		Min: NewVector3(minX, minY, minZ),
+		Max: NewVector3(maxX, maxY, maxZ),
+	}
 }
 
 // NewBoxOfSize returns a box of size centered at center
-func NewBoxOfSize(center VectorN, size float64) *Box {
+func NewBoxOfSize(x, y, z, size float64) *Box {
+	half := size/2
+	min := *NewVector3(x-half, y-half, z-half)
+	max := *NewVector3(x+half, y+half, z+half)
 	return &Box{
-		Center:  &center,
-		Extents: NewVectorN(size/2, size/2, size/2),
+		Min: &min,
+		Max: &max,
 	}
 }
 
 // Equal returns whether a box is equal to another
-func (b *Box) Equal(other Box) bool {
-	return b.Center.Equal(*other.Center) && b.Extents.Equal(*other.Extents)
+func (b Box) Equal(other Box) bool {
+	return b.Min.Equal(*other.Min) && b.Max.Equal(*other.Max)
 }
 
-// GetMin ...
-func (b *Box) GetMin() VectorN {
-	return *b.Center.Minus(*b.Extents)
-}
-
-// GetMax ...
-func (b *Box) GetMax() VectorN {
-	return *b.Center.Plus(*b.Extents)
+// GetCenter ...
+func (b Box) GetCenter() Vector3 {
+	return *b.Min.Lerp(b.Max, 0.5)
 }
 
 // GetSize returns the size of the box
-func (b *Box) GetSize() VectorN {
-	return *b.Extents.Scale(2)
-}
-
-// SetMinMax sets the box to the /min/ and /max/ value of the box.
-func (b *Box) SetMinMax(min, max VectorN) {
-	b.Extents = (max.Minus(min)).Scale(0.5)
-	b.Center = min.Plus(*b.Extents)
-}
-
-// EncapsulatePoint grows the box to include the /point/.
-func (b *Box) EncapsulatePoint(point VectorN) {
-	b.SetMinMax(Min(b.GetMin(), point), Max(b.GetMax(), point))
-}
-
-// EncapsulateBox grows the box to include the /box/.
-func (b *Box) EncapsulateBox(box Box) {
-	b.EncapsulatePoint(*box.Center.Minus(*box.Extents))
-	b.EncapsulatePoint(*box.Center.Plus(*box.Extents))
-}
-
-// Expand the box by increasing its /size/ by /amount/ along each side.
-func (b *Box) Expand(amount float64) {
-	amount *= .5
-	b.Extents = b.Extents.Plus(*NewVectorN(amount, amount, amount))
-}
-
-// ExpandV the box by increasing its /size/ by /amount/ along each side.
-func (b *Box) ExpandV(amount VectorN) {
-	b.Extents = b.Extents.Plus(*amount.Scale(.5))
-}
-
-// In Returns whether the specified point is contained in this box.
-func (v *VectorN) In(box Box) bool {
-	bm := box.GetMin()
-	bmm := box.GetMax()
-	for i := range v.Dimensions {
-		if bm.Get(i) > v.Get(i) || bmm.Get(i) < v.Get(i) {
-			return false
-		}
-	}
-	return true
+func (b *Box) GetSize() Vector3 {
+	return b.Max.Minus(*b.Min)
 }
 
 // Fit Returns whether the specified area is fully contained in the other area.
-func (b *Box) Fit(o Box) bool {
-	return b.Center.Plus(*b.Extents).In(o) && b.Center.Minus(*b.Extents).In(o)
+func (b Box) Fit(o Box) bool {
+	return b.Max.In(o) && b.Min.In(o)
 }
 
 // Intersects Returns whether any portion of this area intersects with the specified area or reversely.
-func (b *Box) Intersects(bb Box) bool {
-	bm := b.GetMin()
-	bmm := b.GetMax()
-	bbm := bb.GetMin()
-	bbmm := bb.GetMax()
-	for i := range bm.Dimensions {
-		if bmm.Get(i) < bbm.Get(i) || bbmm.Get(i) < bm.Get(i) {
-			return false
-		}
-	}
-	return true
+func (b Box) Intersects(b2 Box) bool {
+	return !(b.Max.X < b2.Min.X || b2.Max.X < b.Min.X || b.Max.Y < b2.Min.Y || b2.Max.Y < b.Min.Y || b.Max.Z < b2.Min.Z || b2.Max.Z < b.Min.Z)
 }
 
 
 // Split split a CUBE into sub-cubes
 func (b *Box) Split() [8]*Box {
-	q := b.Extents.Get(0) / 2
-	newExtents := b.Extents.Scale(0.5)
+	center := b.GetCenter()
 	return [8]*Box{
-		{Center: b.Center.Plus(*NewVectorN(-q, q, -q)), Extents: newExtents},
-		{Center: b.Center.Plus(*NewVectorN(q, q, -q)), Extents: newExtents},
-		{Center: b.Center.Plus(*NewVectorN(-q, q, q)), Extents: newExtents},
-		{Center: b.Center.Plus(*NewVectorN(q, q, q)), Extents: newExtents},
+		NewBoxMinMax(b.Max.X, b.Max.Y, b.Max.Z, center.X, center.Y, center.Z),
+		NewBoxMinMax(center.X, b.Max.Y, b.Max.Z, b.Min.X, center.Y, center.Z),
+		NewBoxMinMax(center.X, center.Y, b.Max.Z, b.Min.X, b.Min.Y, center.Z),
+		NewBoxMinMax(b.Max.X, center.Y, b.Max.Z, center.X, b.Min.Y, center.Z),
 
-		{Center: b.Center.Plus(*NewVectorN(-q, -q, -q)), Extents: newExtents},
-		{Center: b.Center.Plus(*NewVectorN(q, -q, -q)), Extents: newExtents},
-		{Center: b.Center.Plus(*NewVectorN(-q, -q, q)), Extents: newExtents},
-		{Center: b.Center.Plus(*NewVectorN(q, -q, q)), Extents: newExtents},
+		NewBoxMinMax(b.Max.X, b.Max.Y, center.Z, center.X, center.Y, b.Min.Z),
+		NewBoxMinMax(center.X, b.Max.Y, center.Z, b.Min.X, center.Y, b.Min.Z),
+		NewBoxMinMax(center.X, center.Y, center.Z, b.Min.X, b.Min.Y, b.Min.Z),
+		NewBoxMinMax(b.Max.X, center.Y, center.Z, center.X, b.Min.Y, b.Min.Z),
 	}
+	//return [8]*Box{
+	//	{Center: b.Center.Plus(*NewVector3(-q, q, -q)), Extents: newExtents},
+	//	{Center: b.Center.Plus(*NewVector3(q, q, -q)), Extents: newExtents},
+	//	{Center: b.Center.Plus(*NewVector3(-q, q, q)), Extents: newExtents},
+	//	{Center: b.Center.Plus(*NewVector3(q, q, q)), Extents: newExtents},
+	//
+	//	{Center: b.Center.Plus(*NewVector3(-q, -q, -q)), Extents: newExtents},
+	//	{Center: b.Center.Plus(*NewVector3(q, -q, -q)), Extents: newExtents},
+	//	{Center: b.Center.Plus(*NewVector3(-q, -q, q)), Extents: newExtents},
+	//	{Center: b.Center.Plus(*NewVector3(q, -q, q)), Extents: newExtents},
+	//}
 }
 
 // MinimumTranslation tells how much an entity has to move to no longer overlap another entity.
 // FIXME ? 3D ? 2D ?
-func MinimumTranslation(b, bb Box) VectorN {
-	mtd := VectorN{}
-	bm := b.GetMin()
-	bmm := b.GetMax()
-	bbm := bb.GetMin()
-	bbmm := bb.GetMax()
-	left := bm.Get(0) - bbmm.Get(0)
-	right := bmm.Get(0) - bbm.Get(0)
-	top := bm.Get(1) - bbmm.Get(1)
-	bottom := bmm.Get(1) - bbm.Get(1)
+func MinimumTranslation(b, b2 Box) Vector3 {
+	mtd := Vector3{}
+	left := b.Min.X - b2.Max.X
+	right := b.Max.X - b2.Min.X
+	top := b.Min.Y - b2.Max.Y
+	bottom := b.Max.Y - b2.Min.Y
 
 	if left > 0 || right < 0 {
 		log.Println("Box aint intercepting")
@@ -143,21 +99,21 @@ func MinimumTranslation(b, bb Box) VectorN {
 		//box doesn't intercept
 	}
 	if math.Abs(left) < right {
-		mtd.Set(0, left)
+		mtd.X = left
 	} else {
-		mtd.Set(0, right)
+		mtd.X = right
 	}
 
 	if math.Abs(top) < bottom {
-		mtd.Set(1, top)
+		mtd.Y = top
 	} else {
-		mtd.Set(1, bottom)
+		mtd.Y = bottom
 	}
 
-	if math.Abs(mtd.Get(0)) < math.Abs(mtd.Get(1)) {
-		mtd.Set(1, 0)
+	if math.Abs(mtd.X) < math.Abs(mtd.Y) {
+		mtd.Y = 0
 	} else {
-		mtd.Set(0, 0)
+		mtd.X = 0
 	}
 
 	return mtd

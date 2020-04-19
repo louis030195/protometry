@@ -20,64 +20,64 @@ func cuboidTris() []int32 {
 // NewMeshSquareCuboid return a mesh forming a square cuboid
 // Based on http://ilkinulas.github.io/development/unity/2016/04/30/cube-mesh-in-unity3d.html
 func NewMeshSquareCuboid(sideLength float64, centerBased bool) *Mesh {
-	var vertices []*VectorN
+	var vertices []*Vector3
 	if centerBased {
 		halfSide := sideLength / 2
-		vertices = []*VectorN{
-			NewVectorN(-halfSide, -halfSide, -halfSide),
-			NewVectorN(halfSide, -halfSide, -halfSide),
-			NewVectorN(halfSide, halfSide, -halfSide),
-			NewVectorN(-halfSide, halfSide, -halfSide),
+		vertices = []*Vector3{
+			NewVector3(-halfSide, -halfSide, -halfSide),
+			NewVector3(halfSide, -halfSide, -halfSide),
+			NewVector3(halfSide, halfSide, -halfSide),
+			NewVector3(-halfSide, halfSide, -halfSide),
 
-			NewVectorN(-halfSide, halfSide, halfSide),
-			NewVectorN(halfSide, halfSide, halfSide),
-			NewVectorN(halfSide, -halfSide, halfSide),
-			NewVectorN(-halfSide, -halfSide, halfSide),
+			NewVector3(-halfSide, halfSide, halfSide),
+			NewVector3(halfSide, halfSide, halfSide),
+			NewVector3(halfSide, -halfSide, halfSide),
+			NewVector3(-halfSide, -halfSide, halfSide),
 		}
 
 	} else {
-		vertices = []*VectorN{
-			NewVectorN(0, 0, 0),
-			NewVectorN(sideLength, 0, 0),
-			NewVectorN(sideLength, sideLength, 0),
-			NewVectorN(0, sideLength, 0),
+		vertices = []*Vector3{
+			NewVector3(0, 0, 0),
+			NewVector3(sideLength, 0, 0),
+			NewVector3(sideLength, sideLength, 0),
+			NewVector3(0, sideLength, 0),
 
-			NewVectorN(0, sideLength, sideLength),
-			NewVectorN(sideLength, sideLength, sideLength),
-			NewVectorN(sideLength, 0, sideLength),
-			NewVectorN(0, 0, sideLength),
+			NewVector3(0, sideLength, sideLength),
+			NewVector3(sideLength, sideLength, sideLength),
+			NewVector3(sideLength, 0, sideLength),
+			NewVector3(0, 0, sideLength),
 		}
 	}
 
 	return &Mesh{Vertices: vertices, Tris: cuboidTris()}
 }
 
-func NewMeshRectangularCuboid(size VectorN, centerBased bool) *Mesh {
-	var vertices []*VectorN
+func NewMeshRectangularCuboid(size Vector3, centerBased bool) *Mesh {
+	var vertices []*Vector3
 	if centerBased {
-		halfSize := size.Scale(0.5)
-		vertices = []*VectorN{
-			NewVectorN(-halfSize.Get(0), -halfSize.Get(1), -halfSize.Get(2)),
-			NewVectorN(halfSize.Get(0), -halfSize.Get(1), -halfSize.Get(2)),
-			NewVectorN(halfSize.Get(0), halfSize.Get(1), -halfSize.Get(2)),
-			NewVectorN(-halfSize.Get(0), halfSize.Get(1), -halfSize.Get(2)),
+		halfSize := size.Times(0.5)
+		vertices = []*Vector3{
+			NewVector3(-halfSize.X, -halfSize.Y, -halfSize.Z),
+			NewVector3(halfSize.X, -halfSize.Y, -halfSize.Z),
+			NewVector3(halfSize.X, halfSize.Y, -halfSize.Z),
+			NewVector3(-halfSize.X, halfSize.Y, -halfSize.Z),
 
-			NewVectorN(-halfSize.Get(0), halfSize.Get(1), halfSize.Get(2)),
-			NewVectorN(halfSize.Get(0), halfSize.Get(1), halfSize.Get(2)),
-			NewVectorN(halfSize.Get(0), -halfSize.Get(1), halfSize.Get(2)),
-			NewVectorN(-halfSize.Get(0), -halfSize.Get(1), halfSize.Get(2)),
+			NewVector3(-halfSize.X, halfSize.Y, halfSize.Z),
+			NewVector3(halfSize.X, halfSize.Y, halfSize.Z),
+			NewVector3(halfSize.X, -halfSize.Y, halfSize.Z),
+			NewVector3(-halfSize.X, -halfSize.Y, halfSize.Z),
 		}
 	} else {
-		vertices = []*VectorN{
-			NewVectorN(0, 0, 0),
-			NewVectorN(size.Get(0), 0, 0),
-			NewVectorN(size.Get(0), size.Get(1), 0),
-			NewVectorN(0, size.Get(1), 0),
+		vertices = []*Vector3{
+			NewVector3(0, 0, 0),
+			NewVector3(size.X, 0, 0),
+			NewVector3(size.X, size.Y, 0),
+			NewVector3(0, size.Y, 0),
 
-			NewVectorN(0, size.Get(1), size.Get(2)),
-			NewVectorN(size.Get(0), size.Get(1), size.Get(2)),
-			NewVectorN(size.Get(0), 0, size.Get(2)),
-			NewVectorN(0, 0, size.Get(2)),
+			NewVector3(0, size.Y, size.Z),
+			NewVector3(size.X, size.Y, size.Z),
+			NewVector3(size.X, 0, size.Z),
+			NewVector3(0, 0, size.Z),
 		}
 	}
 

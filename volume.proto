@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package protometry;
+
+option java_multiple_files = true;
+option java_package = "com.protometry";
+option java_outer_classname = "Protometry";
+option csharp_namespace = "Protometry";
+
+import "vector3.proto";
+
+message Sphere {
+  protometry.Vector3 center = 1;
+  double radius = 2;
+}
+
+message Capsule {
+  protometry.Vector3 center = 1;
+  double width = 2;
+}
+
+// Box is an AABB volume
+message Box {
+  protometry.Vector3 min = 1;
+  protometry.Vector3 max = 2;
+}
+
+message Mesh {
+  protometry.Vector3 center = 1; // I.e "pivot"
+  repeated protometry.Vector3 vertices = 2;
+  repeated int32 tris = 3;
+  repeated protometry.Vector3 normals = 4;
+  repeated protometry.Vector3 uvs = 5;
+}
