@@ -17,31 +17,31 @@ func TestNewBoxMinMax(t *testing.T) {
 		// TODO: Add test cases.
 		{
 			args: args{[]float64{0, 0, 0, 1, 1, 1}},
-			want: &Box{Center: *NewVectorN(0.5, 0.5, 0.5), Extents: *NewVectorN(0.5, 0.5, 0.5)},
+			want: &Box{Center: NewVectorN(0.5, 0.5, 0.5), Extents: NewVectorN(0.5, 0.5, 0.5)},
 		},
 		{
 			args: args{[]float64{0, 0, 0, 1, 0, 0}},
-			want: &Box{Center: *NewVectorN(0.5, 0, 0), Extents: *NewVectorN(0.5, 0, 0)},
+			want: &Box{Center: NewVectorN(0.5, 0, 0), Extents: NewVectorN(0.5, 0, 0)},
 		},
 		{
 			args: args{[]float64{0, 0, 0, 0, 1, 0}},
-			want: &Box{Center: *NewVectorN(0, 0.5, 0), Extents: *NewVectorN(0, 0.5, 0)},
+			want: &Box{Center: NewVectorN(0, 0.5, 0), Extents: NewVectorN(0, 0.5, 0)},
 		},
 		{
 			args: args{[]float64{0, 0, 0, 0, 0, 1}},
-			want: &Box{Center: *NewVectorN(0, 0, 0.5), Extents: *NewVectorN(0, 0, 0.5)},
+			want: &Box{Center: NewVectorN(0, 0, 0.5), Extents: NewVectorN(0, 0, 0.5)},
 		},
 		{ // Reversed
 			args: args{[]float64{0, 0, 1, 0, 0, 0}},
-			want: &Box{Center: *NewVectorN(0, 0, 0.5), Extents: *NewVectorN(0, 0, -0.5)},
+			want: &Box{Center: NewVectorN(0, 0, 0.5), Extents: NewVectorN(0, 0, -0.5)},
 		},
 		{
 			args: args{[]float64{0, 1, 0, 0, 0, 0}},
-			want: &Box{Center: *NewVectorN(0, 0.5, 0), Extents: *NewVectorN(0, -0.5, 0)},
+			want: &Box{Center: NewVectorN(0, 0.5, 0), Extents: NewVectorN(0, -0.5, 0)},
 		},
 		{
 			args: args{[]float64{1, 0, 0, 0, 0, 0}},
-			want: &Box{Center: *NewVectorN(0.5, 0, 0), Extents: *NewVectorN(-0.5, 0, 0)},
+			want: &Box{Center: NewVectorN(0.5, 0, 0), Extents: NewVectorN(-0.5, 0, 0)},
 		},
 	}
 	for _, tt := range tests {
@@ -66,11 +66,11 @@ func TestNewBoxOfSize(t *testing.T) {
 		// TODO: Add test cases.
 		{
 			args: args{center: *NewVectorN(0, 0, 0), size: 1},
-			want: &Box{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(0.5, 0.5, 0.5)},
+			want: &Box{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(0.5, 0.5, 0.5)},
 		},
 		{
 			args: args{center: *NewVectorN(0, 12, 23.2), size: 1.3},
-			want: &Box{Center: *NewVectorN(0, 12, 23.2), Extents: *NewVectorN(0.65, 0.65, 0.65)},
+			want: &Box{Center: NewVectorN(0, 12, 23.2), Extents: NewVectorN(0.65, 0.65, 0.65)},
 		},
 	}
 	for _, tt := range tests {
@@ -84,8 +84,8 @@ func TestNewBoxOfSize(t *testing.T) {
 
 func TestBox_Equal(t *testing.T) {
 	type fields struct {
-		Center  VectorN
-		Extents VectorN
+		Center  *VectorN
+		Extents *VectorN
 	}
 	type args struct {
 		other Box
@@ -98,28 +98,28 @@ func TestBox_Equal(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			fields: fields{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(0.5, 0.5, 0.5)},
+			fields: fields{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(0.5, 0.5, 0.5)},
 			args:   args{other: *NewBoxOfSize(*NewVectorN(0, 0, 0), 1)},
 			want:   true,
 		},
 		{
-			fields: fields{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(1, 1, 1)},
+			fields: fields{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(1, 1, 1)},
 			args:   args{other: *NewBoxMinMax(-1, -1, -1, 1, 1, 1)},
 			want:   true,
 		},
 		{
-			fields: fields{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(1, 1, 1)},
-			args:   args{other: Box{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(1, 1, 1)}},
+			fields: fields{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(1, 1, 1)},
+			args:   args{other: Box{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(1, 1, 1)}},
 			want:   true,
 		},
 		{
-			fields: fields{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(1, 1, 1)},
-			args:   args{other: Box{Center: *NewVectorN(0.1, 0, 0), Extents: *NewVectorN(1, 1, 1)}},
+			fields: fields{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(1, 1, 1)},
+			args:   args{other: Box{Center: NewVectorN(0.1, 0, 0), Extents: NewVectorN(1, 1, 1)}},
 			want:   false,
 		},
 		{
-			fields: fields{Center: *NewVectorN(0, 92, 0), Extents: *NewVectorN(1, 1, 1)},
-			args:   args{other: Box{Center: *NewVectorN(0, 92, 0), Extents: *NewVectorN(1, 1, 1)}},
+			fields: fields{Center: NewVectorN(0, 92, 0), Extents: NewVectorN(1, 1, 1)},
+			args:   args{other: Box{Center: NewVectorN(0, 92, 0), Extents: NewVectorN(1, 1, 1)}},
 			want:   true,
 		},
 	}
@@ -138,22 +138,22 @@ func TestBox_Equal(t *testing.T) {
 
 func TestBox_GetMin(t *testing.T) {
 	type fields struct {
-		Center  VectorN
-		Extents VectorN
+		Center  *VectorN
+		Extents *VectorN
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		want   VectorN
+		want   *VectorN
 	}{
 		// TODO: Add test cases.
 		{
-			fields: fields{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(1, 1, 1)},
-			want:   *NewVectorN(-1, -1, -1),
+			fields: fields{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(1, 1, 1)},
+			want:   NewVectorN(-1, -1, -1),
 		},
 		{
-			fields: fields{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(1, 2.5, 1)},
-			want:   *NewVectorN(-1, -2.5, -1),
+			fields: fields{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(1, 2.5, 1)},
+			want:   NewVectorN(-1, -2.5, -1),
 		},
 	}
 	for _, tt := range tests {
@@ -162,7 +162,7 @@ func TestBox_GetMin(t *testing.T) {
 				Center:  tt.fields.Center,
 				Extents: tt.fields.Extents,
 			}
-			if got := b.GetMin(); !reflect.DeepEqual(got, tt.want) {
+			if got := b.GetMin(); !got.Equal(*tt.want) {
 				t.Errorf("Box.GetMin() = %v, want %v", got, tt.want)
 			}
 		})
@@ -171,22 +171,22 @@ func TestBox_GetMin(t *testing.T) {
 
 func TestBox_GetMax(t *testing.T) {
 	type fields struct {
-		Center  VectorN
-		Extents VectorN
+		Center  *VectorN
+		Extents *VectorN
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		want   VectorN
+		want   *VectorN
 	}{
 		// TODO: Add test cases.
 		{
-			fields: fields{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(1, 1, 1)},
-			want:   *NewVectorN(1, 1, 1),
+			fields: fields{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(1, 1, 1)},
+			want:   NewVectorN(1, 1, 1),
 		},
 		{
-			fields: fields{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(1, 2.5, 1)},
-			want:   *NewVectorN(1, 2.5, 1),
+			fields: fields{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(1, 2.5, 1)},
+			want:   NewVectorN(1, 2.5, 1),
 		},
 	}
 	for _, tt := range tests {
@@ -195,7 +195,7 @@ func TestBox_GetMax(t *testing.T) {
 				Center:  tt.fields.Center,
 				Extents: tt.fields.Extents,
 			}
-			if got := b.GetMax(); !reflect.DeepEqual(got, tt.want) {
+			if got := b.GetMax(); !got.Equal(*tt.want) {
 				t.Errorf("Box.GetMax() = %v, want %v", got, tt.want)
 			}
 		})
@@ -204,22 +204,22 @@ func TestBox_GetMax(t *testing.T) {
 
 func TestBox_GetSize(t *testing.T) {
 	type fields struct {
-		Center  VectorN
-		Extents VectorN
+		Center  *VectorN
+		Extents *VectorN
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		want   VectorN
+		want   *VectorN
 	}{
 		// TODO: Add test cases.
 		{
-			fields: fields{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(1, 1, 1)},
-			want:   *NewVectorN(2, 2, 2),
+			fields: fields{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(1, 1, 1)},
+			want:   NewVectorN(2, 2, 2),
 		},
 		{
-			fields: fields{Center: *NewVectorN(0, 0, 0), Extents: *NewVectorN(0, 12, 1)},
-			want:   *NewVectorN(0, 24, 2),
+			fields: fields{Center: NewVectorN(0, 0, 0), Extents: NewVectorN(0, 12, 1)},
+			want:   NewVectorN(0, 24, 2),
 		},
 	}
 	for _, tt := range tests {
@@ -228,7 +228,7 @@ func TestBox_GetSize(t *testing.T) {
 				Center:  tt.fields.Center,
 				Extents: tt.fields.Extents,
 			}
-			if got := b.GetSize(); !reflect.DeepEqual(got, tt.want) {
+			if got := b.GetSize(); !got.Equal(*tt.want) {
 				t.Errorf("Box.GetSize() = %v, want %v", got, tt.want)
 			}
 		})
@@ -242,8 +242,8 @@ func TestBox_SetMinMax(t *testing.T) {
 	Equals(t, true, min.Equal(*NewVectorN(0, 0, 0)))
 	max := b.GetMax()
 	Equals(t, true, max.Equal(*NewVectorN(1, 1, 1)))
-	Equals(t, *NewVectorN(0.5, 0.5, 0.5), b.Center)
-	Equals(t, *NewVectorN(0.5, 0.5, 0.5), b.Extents)
+	Equals(t, NewVectorN(0.5, 0.5, 0.5), b.Center)
+	Equals(t, NewVectorN(0.5, 0.5, 0.5), b.Extents)
 
 	// X line
 	b.SetMinMax(*NewVectorN(0, 0, 0), *NewVectorN(1, 0, 0))
@@ -251,8 +251,8 @@ func TestBox_SetMinMax(t *testing.T) {
 	Equals(t, true, min.Equal(*NewVectorN(0, 0, 0)))
 	max = b.GetMax()
 	Equals(t, true, max.Equal(*NewVectorN(1, 0, 0)))
-	Equals(t, *NewVectorN(0.5, 0, 0), b.Center)
-	Equals(t, *NewVectorN(0.5, 0, 0), b.Extents)
+	Equals(t, NewVectorN(0.5, 0, 0), b.Center)
+	Equals(t, NewVectorN(0.5, 0, 0), b.Extents)
 
 	// Y line
 	b.SetMinMax(*NewVectorN(0, 0, 0), *NewVectorN(0, 1, 0))
@@ -260,8 +260,8 @@ func TestBox_SetMinMax(t *testing.T) {
 	Equals(t, true, min.Equal(*NewVectorN(0, 0, 0)))
 	max = b.GetMax()
 	Equals(t, true, max.Equal(*NewVectorN(0, 1, 0)))
-	Equals(t, *NewVectorN(0, 0.5, 0), b.Center)
-	Equals(t, *NewVectorN(0, 0.5, 0), b.Extents)
+	Equals(t, NewVectorN(0, 0.5, 0), b.Center)
+	Equals(t, NewVectorN(0, 0.5, 0), b.Extents)
 
 	// Z line
 	b.SetMinMax(*NewVectorN(0, 0, 0), *NewVectorN(0, 0, 1))
@@ -269,8 +269,8 @@ func TestBox_SetMinMax(t *testing.T) {
 	Equals(t, true, min.Equal(*NewVectorN(0, 0, 0)))
 	max = b.GetMax()
 	Equals(t, true, max.Equal(*NewVectorN(0, 0, 1)))
-	Equals(t, *NewVectorN(0, 0, 0.5), b.Center)
-	Equals(t, *NewVectorN(0, 0, 0.5), b.Extents)
+	Equals(t, NewVectorN(0, 0, 0.5), b.Center)
+	Equals(t, NewVectorN(0, 0, 0.5), b.Extents)
 
 	// Reversed Z line
 	b.SetMinMax(*NewVectorN(0, 0, 1), *NewVectorN(0, 0, 0))
@@ -278,8 +278,8 @@ func TestBox_SetMinMax(t *testing.T) {
 	Equals(t, true, min.Equal(*NewVectorN(0, 0, 1)))
 	max = b.GetMax()
 	Equals(t, true, max.Equal(*NewVectorN(0, 0, 0)))
-	Equals(t, *NewVectorN(0, 0, 0.5), b.Center)
-	Equals(t, *NewVectorN(0, 0, -0.5), b.Extents)
+	Equals(t, NewVectorN(0, 0, 0.5), b.Center)
+	Equals(t, NewVectorN(0, 0, -0.5), b.Extents)
 }
 
 func TestBox_EncapsulatePoint(t *testing.T) {
@@ -528,26 +528,26 @@ func TestBox_Split(t *testing.T) {
 		...
 	 */
 	b := Box{
-		Center: VectorN{
+		Center: &VectorN{
 			Dimensions: []float64{0.5, 0.5, 0.5},
 		},
-		Extents: VectorN{
+		Extents: &VectorN{
 			Dimensions:[]float64{0.5, 0.5, 0.5},
 		},
 	}
 	got := b.Split()
 
-	childExtents := *b.Extents.Scale(0.5)
+	childExtents := b.Extents.Scale(0.5)
 	want := [8]*Box{
-		{Center: VectorN{Dimensions: []float64{0.25, 0.75, 0.25}}, Extents: childExtents},
-		{Center: VectorN{Dimensions: []float64{0.75, 0.75, 0.25}}, Extents:childExtents},
-		{Center: VectorN{Dimensions: []float64{0.25, 0.75, 0.75}}, Extents: childExtents},
-		{Center: VectorN{Dimensions: []float64{0.75, 0.75, 0.75}}, Extents: childExtents},
+		{Center: &VectorN{Dimensions: []float64{0.25, 0.75, 0.25}}, Extents: childExtents},
+		{Center: &VectorN{Dimensions: []float64{0.75, 0.75, 0.25}}, Extents: childExtents},
+		{Center: &VectorN{Dimensions: []float64{0.25, 0.75, 0.75}}, Extents: childExtents},
+		{Center: &VectorN{Dimensions: []float64{0.75, 0.75, 0.75}}, Extents: childExtents},
 
-		{Center: VectorN{Dimensions: []float64{0.25, 0.25, 0.25}}, Extents: childExtents},
-		{Center: VectorN{Dimensions: []float64{0.75, 0.25, 0.25}}, Extents: childExtents},
-		{Center: VectorN{Dimensions: []float64{0.25, 0.25, 0.75}}, Extents: childExtents},
-		{Center: VectorN{Dimensions: []float64{0.75, 0.25, 0.75}}, Extents: childExtents},
+		{Center: &VectorN{Dimensions: []float64{0.25, 0.25, 0.25}}, Extents: childExtents},
+		{Center: &VectorN{Dimensions: []float64{0.75, 0.25, 0.25}}, Extents: childExtents},
+		{Center: &VectorN{Dimensions: []float64{0.25, 0.25, 0.75}}, Extents: childExtents},
+		{Center: &VectorN{Dimensions: []float64{0.75, 0.25, 0.75}}, Extents: childExtents},
 	}
 
 	tester := func(got, want [8]*Box) {

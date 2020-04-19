@@ -54,7 +54,7 @@ a.Fit(*b) // False
 ## Test
 
 ```bash
-go test -v github.com/The-Tensox/protometry
+go test -v
 ```
 
 ## Benchmarks
@@ -69,12 +69,12 @@ go test -benchmem -run XXX -bench .
 |BenchmarkArea_NewBoxOfSize-8   |   380234211   |   3.07 ns/op   |   0 B/op   |   0 allocs/op   |
 |BenchmarkArea_Fit-8   |   683202   |   1816 ns/op   |   720 B/op   |   24 allocs/op   |
 |BenchmarkArea_Intersects-8   |   971000   |   1255 ns/op   |   480 B/op   |   16 allocs/op   |
-|BenchmarkArea_Split-8   |   138618   |   9349 ns/op   |   4016 B/op   |   112 allocs/op   |
+|BenchmarkArea_Split-8   |   277064   |   3703 ns/op   |   1464 B/op   |   44 allocs/op   |
 
 ## TODO
 
 - [ ] Encoding
-- [ ] Other volumes (sphere, capsule, Convex ...)
+- [ ] Handle other volumes (sphere, capsule, mesh ...) and make them follow [an interface](./volumen.go)
 - [ ] Take inspiration from [numpy](https://numpy.org)
 - [ ] Improve benchmarks
 - [ ] Setup CI for verifying performances (benchmarks)

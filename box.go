@@ -1,36 +1,10 @@
 package protometry
 
 import (
-	"fmt"
 	"log"
 	"math"
 )
 
-
-// Area is a 3-d interface representing volumes like Boxes, Spheres, Capsules ...
-type Area interface {
-	Fit(Area) bool
-	Intersects(Area) bool
-}
-
-// Sphere TODO
-type Sphere struct {
-}
-
-// Capsule TODO
-type Capsule struct {
-}
-
-// Convex TODO
-type Convex struct {
-}
-
-// Box is an AABB volume
-type Box struct {
-	Center  VectorN
-	// Extents represents half of the box length for every axis
-	Extents VectorN
-}
 
 // NewBoxMinMax returns a new box using min max
 func NewBoxMinMax(dims ...float64) *Box {
@@ -42,24 +16,24 @@ func NewBoxMinMax(dims ...float64) *Box {
 // NewBoxOfSize returns a box of size centered at center
 func NewBoxOfSize(center VectorN, size float64) *Box {
 	return &Box{
-		Center:  center,
-		Extents: *NewVectorN(size/2, size/2, size/2),
+		Center:  &center,
+		Extents: NewVectorN(size/2, size/2, size/2),
 	}
 }
 
 // Equal returns whether a box is equal to another
 func (b *Box) Equal(other Box) bool {
-	return b.Center.Equal(other.Center) && b.Extents.Equal(other.Extents)
+	return b.Center.Equal(*other.Center) && b.Extents.Equal(*other.Extents)
 }
 
 // GetMin ...
 func (b *Box) GetMin() VectorN {
-	return *b.Center.Minus(b.Extents)
+	return *b.Center.Minus(*b.Extents)
 }
 
 // GetMax ...
 func (b *Box) GetMax() VectorN {
-	return *b.Center.Plus(b.Extents)
+	return *b.Center.Plus(*b.Extents)
 }
 
 // GetSize returns the size of the box
@@ -69,8 +43,8 @@ func (b *Box) GetSize() VectorN {
 
 // SetMinMax sets the box to the /min/ and /max/ value of the box.
 func (b *Box) SetMinMax(min, max VectorN) {
-	b.Extents = *(max.Minus(min)).Scale(0.5)
-	b.Center = *min.Plus(b.Extents)
+	b.Extents = (max.Minus(min)).Scale(0.5)
+	b.Center = min.Plus(*b.Extents)
 }
 
 // EncapsulatePoint grows the box to include the /point/.
@@ -80,19 +54,19 @@ func (b *Box) EncapsulatePoint(point VectorN) {
 
 // EncapsulateBox grows the box to include the /box/.
 func (b *Box) EncapsulateBox(box Box) {
-	b.EncapsulatePoint(*box.Center.Minus(box.Extents))
-	b.EncapsulatePoint(*box.Center.Plus(box.Extents))
+	b.EncapsulatePoint(*box.Center.Minus(*box.Extents))
+	b.EncapsulatePoint(*box.Center.Plus(*box.Extents))
 }
 
 // Expand the box by increasing its /size/ by /amount/ along each side.
 func (b *Box) Expand(amount float64) {
 	amount *= .5
-	b.Extents = *b.Extents.Plus(*NewVectorN(amount, amount, amount))
+	b.Extents = b.Extents.Plus(*NewVectorN(amount, amount, amount))
 }
 
 // ExpandV the box by increasing its /size/ by /amount/ along each side.
 func (b *Box) ExpandV(amount VectorN) {
-	b.Extents = *b.Extents.Plus(*amount.Scale(.5))
+	b.Extents = b.Extents.Plus(*amount.Scale(.5))
 }
 
 // In Returns whether the specified point is contained in this box.
@@ -109,7 +83,7 @@ func (v *VectorN) In(box Box) bool {
 
 // Fit Returns whether the specified area is fully contained in the other area.
 func (b *Box) Fit(o Box) bool {
-	return b.Center.Plus(b.Extents).In(o) && b.Center.Minus(b.Extents).In(o)
+	return b.Center.Plus(*b.Extents).In(o) && b.Center.Minus(*b.Extents).In(o)
 }
 
 // Intersects Returns whether any portion of this area intersects with the specified area or reversely.
@@ -130,17 +104,17 @@ func (b *Box) Intersects(bb Box) bool {
 // Split split a CUBE into sub-cubes
 func (b *Box) Split() [8]*Box {
 	q := b.Extents.Get(0) / 2
-	newExtents := *b.Extents.Scale(0.5)
+	newExtents := b.Extents.Scale(0.5)
 	return [8]*Box{
-		{Center: *b.Center.Plus(*NewVectorN(-q, q, -q)), Extents: newExtents},
-		{Center: *b.Center.Plus(*NewVectorN(q, q, -q)), Extents: newExtents},
-		{Center: *b.Center.Plus(*NewVectorN(-q, q, q)), Extents: newExtents},
-		{Center: *b.Center.Plus(*NewVectorN(q, q, q)), Extents: newExtents},
+		{Center: b.Center.Plus(*NewVectorN(-q, q, -q)), Extents: newExtents},
+		{Center: b.Center.Plus(*NewVectorN(q, q, -q)), Extents: newExtents},
+		{Center: b.Center.Plus(*NewVectorN(-q, q, q)), Extents: newExtents},
+		{Center: b.Center.Plus(*NewVectorN(q, q, q)), Extents: newExtents},
 
-		{Center: *b.Center.Plus(*NewVectorN(-q, -q, -q)), Extents: newExtents},
-		{Center: *b.Center.Plus(*NewVectorN(q, -q, -q)), Extents: newExtents},
-		{Center: *b.Center.Plus(*NewVectorN(-q, -q, q)), Extents: newExtents},
-		{Center: *b.Center.Plus(*NewVectorN(q, -q, q)), Extents: newExtents},
+		{Center: b.Center.Plus(*NewVectorN(-q, -q, -q)), Extents: newExtents},
+		{Center: b.Center.Plus(*NewVectorN(q, -q, -q)), Extents: newExtents},
+		{Center: b.Center.Plus(*NewVectorN(-q, -q, q)), Extents: newExtents},
+		{Center: b.Center.Plus(*NewVectorN(q, -q, q)), Extents: newExtents},
 	}
 }
 
@@ -190,9 +164,11 @@ func MinimumTranslation(b, bb Box) VectorN {
 }
 
 // String returns a human-readable representation of the box
-func (b *Box) String() string {
-	bm := b.GetMin()
-	bmm := b.GetMax()
-	return fmt.Sprintf("Center: %v, \nExtents: %v, \nmin %v, \nmax %v",
-		b.Center.String(), b.Extents.String(), bm.String(), bmm.String())
-}
+//func (b *Box) String() string {
+//	bm := b.GetMin()
+//	bmm := b.GetMax()
+//	return fmt.Sprintf("Center: %v, \nExtents: %v, \nmin %v, \nmax %v",
+//		b.Center.String(), b.Extents.String(), bm.String(), bmm.String())
+//}
+
+

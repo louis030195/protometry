@@ -63,7 +63,9 @@ func init() {
 	proto.RegisterType((*QuaternionN)(nil), "protometry.QuaternionN")
 }
 
-func init() { proto.RegisterFile("quaternionn.proto", fileDescriptor_09a15d631415a433) }
+func init() {
+	proto.RegisterFile("quaternionn.proto", fileDescriptor_09a15d631415a433)
+}
 
 var fileDescriptor_09a15d631415a433 = []byte{
 	// 122 bytes of a gzipped FileDescriptorProto
