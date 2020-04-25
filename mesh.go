@@ -52,33 +52,19 @@ func NewMeshSquareCuboid(sideLength float64, centerBased bool) *Mesh {
 	return &Mesh{Vertices: vertices, Tris: cuboidTris()}
 }
 
-func NewMeshRectangularCuboid(size Vector3, centerBased bool) *Mesh {
+func NewMeshRectangularCuboid(center, size Vector3) *Mesh {
 	var vertices []*Vector3
-	if centerBased {
-		halfSize := size.Times(0.5)
-		vertices = []*Vector3{
-			NewVector3(-halfSize.X, -halfSize.Y, -halfSize.Z),
-			NewVector3(halfSize.X, -halfSize.Y, -halfSize.Z),
-			NewVector3(halfSize.X, halfSize.Y, -halfSize.Z),
-			NewVector3(-halfSize.X, halfSize.Y, -halfSize.Z),
+	halfSize := size.Times(0.5)
+	vertices = []*Vector3{
+		NewVector3(-halfSize.X, -halfSize.Y, -halfSize.Z),
+		NewVector3(halfSize.X, -halfSize.Y, -halfSize.Z),
+		NewVector3(halfSize.X, halfSize.Y, -halfSize.Z),
+		NewVector3(-halfSize.X, halfSize.Y, -halfSize.Z),
 
-			NewVector3(-halfSize.X, halfSize.Y, halfSize.Z),
-			NewVector3(halfSize.X, halfSize.Y, halfSize.Z),
-			NewVector3(halfSize.X, -halfSize.Y, halfSize.Z),
-			NewVector3(-halfSize.X, -halfSize.Y, halfSize.Z),
-		}
-	} else {
-		vertices = []*Vector3{
-			NewVector3(0, 0, 0),
-			NewVector3(size.X, 0, 0),
-			NewVector3(size.X, size.Y, 0),
-			NewVector3(0, size.Y, 0),
-
-			NewVector3(0, size.Y, size.Z),
-			NewVector3(size.X, size.Y, size.Z),
-			NewVector3(size.X, 0, size.Z),
-			NewVector3(0, 0, size.Z),
-		}
+		NewVector3(-halfSize.X, halfSize.Y, halfSize.Z),
+		NewVector3(halfSize.X, halfSize.Y, halfSize.Z),
+		NewVector3(halfSize.X, -halfSize.Y, halfSize.Z),
+		NewVector3(-halfSize.X, -halfSize.Y, halfSize.Z),
 	}
 
 	return &Mesh{Vertices: vertices, Tris: cuboidTris()}

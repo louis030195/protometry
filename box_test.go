@@ -230,59 +230,52 @@ func TestBox_Split(t *testing.T) {
 	//tester(got, want)
 }
 
-// FIXME fix these trash benchmarks
 func BenchmarkArea_NewBoxMinMax(b *testing.B) {
 	size := float64(b.N)
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0.; i < size; i++ {
 		NewBoxMinMax(i, i, i, i*2, i*2, i*2)
 	}
-	b.StopTimer()
 }
 
 func BenchmarkArea_NewBoxOfSize(b *testing.B) {
 	size := float64(b.N)
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0.; i < size; i++ {
 		NewBoxOfSize(i, i, i, i)
 	}
-	b.StopTimer()
 }
 
 func BenchmarkArea_In(b *testing.B) {
 	size := float64(b.N)
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0.; i < size; i++ {
 		NewVector3(i, i, i).In(*NewBoxOfSize(i, i, i, 1))
 	}
-	b.StopTimer()
 }
 
 func BenchmarkArea_Fit(b *testing.B) {
 	size := float64(b.N)
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0.; i < size; i++ {
 		NewBoxOfSize(i, i, i, 0.1).Fit(*NewBoxOfSize(i, i, i, 1))
 	}
-	b.StopTimer()
 }
 
 func BenchmarkArea_Intersects(b *testing.B) {
 	size := float64(b.N)
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0.; i < size; i++ {
 		NewBoxOfSize(i, i, i, 1).Intersects(*NewBoxOfSize(i, i, i, 1))
 	}
-	b.StopTimer()
 }
 
 func BenchmarkArea_Split(b *testing.B) {
 	size := float64(b.N)
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 0.; i < size; i++ {
 		NewBoxOfSize(i, i, i, 1).Split()
 	}
-	b.StopTimer()
 }
 
 
@@ -390,6 +383,14 @@ func TestBox_Fit1(t *testing.T) {
 			},
 			args:args{o: *NewBoxMinMax(0.5, 0.5, 0.5, 1, 1, 1)},
 			want: true,
+		},
+		{
+			fields:fields{
+				Min:                  NewVector3(5.85, -3.9, 5.2),
+				Max:                  NewVector3(6.85, -2.9, 6.2),
+			},
+			args:args{o: *NewBoxMinMax(2.92, -1.9, 2.59, 10.3, -4.4, 9.3)},
+			want: false,
 		},
 	}
 	for _, tt := range tests {

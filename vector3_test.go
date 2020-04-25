@@ -165,16 +165,79 @@ func TestVector3_Clone(t *testing.T) {
 	Equals(t, 12., b.X)
 }
 
+func TestVector3_Minus(t *testing.T) {
+	a := NewVector3(12, 4, 6)
+	b := NewVector3(-12, -4, -6)
+	c := a.Minus(*b)
+	// Check if properly NOT in-place
+	Equals(t, true, a.Equal(*NewVector3(12, 4, 6)))
+	Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
+
+	// And properly do the operation
+	Equals(t, true, c.Equal(*NewVector3(24, 8, 12)))
+}
+
+func TestVector3_Scale(t *testing.T) {
+	a := NewVector3(12, 4, 6)
+	a.Scale(2)
+	// Check if properly in-place
+	Equals(t, true, a.Equal(*NewVector3(24, 8, 12)))
+}
+
+func TestVector3_Subtract(t *testing.T) {
+	a := NewVector3(12, 4, 6)
+	b := NewVector3(-12, -4, -6)
+	a.Subtract(b)
+	// Check if properly in-place
+	Equals(t, true, a.Equal(*NewVector3(24, 8, 12)))
+	Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
+}
+
+func TestVector3_Times(t *testing.T) {
+	a := NewVector3(12, 4, 6)
+	b := NewVector3(-12, -4, -6)
+	c := a.Times(2)
+	// Check if properly NOT in-place
+	Equals(t, true, a.Equal(*NewVector3(12, 4, 6)))
+	Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
+
+	// And properly do the operation
+	Equals(t, true, c.Equal(*NewVector3(24, 8, 12)))
+}
+
+func TestVector3_Add(t *testing.T) {
+	a := NewVector3(12, 4, 6)
+	b := NewVector3(-12, -4, -6)
+	a.Add(b)
+	// Check if properly in-place
+	Equals(t, true, a.Equal(*NewVector3(0, 0, 0)))
+	Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
+}
+
+func TestVector3_Plus(t *testing.T) {
+	a := NewVector3(12, 4, 6)
+	b := NewVector3(-12, -4, -6)
+	c := a.Plus(*b)
+	// Check if properly NOT in-place
+	Equals(t, true, a.Equal(*NewVector3(12, 4, 6)))
+	Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
+
+	// And properly do the operation
+	Equals(t, true, c.Equal(*NewVector3(0, 0, 0)))
+}
+
+
+
+
 func BenchmarkVector_Plus(b *testing.B) {
 	var vectors []Vector3
 	for i := 0; i < b.N; i++ {
 		vectors = append(vectors, *NewVector3(0, 0, 0))
 	}
-	b.StartTimer()
+	b.ResetTimer()
 	for i := 1; i < b.N; i++ {
 		vectors[i-1].Plus(vectors[i])
 	}
-	b.StopTimer()
 }
 
 func BenchmarkVector_Add(b *testing.B) {
@@ -209,3 +272,4 @@ func BenchmarkVector_Subtract(b *testing.B) {
 		vectors[i-1].Subtract(&vectors[i])
 	}
 }
+

@@ -60,9 +60,12 @@ go test -v
 ## Benchmarks
 
 ```bash
-go test -benchmem -run XXX -bench .
+go test -benchmem -run XXX -bench . -benchtime 100000x # or -benchtime 0.02s
 ```
 
+![](docs/bench.png)
+
+<!--
 |Name   |   Runs   |   time   |   Bytes   |   Allocs   |
 |:-----:|:--------:|:--------:|:---------:|:----------:|
 |BenchmarkArea_NewBoxMinMax-8   |   1169382   |   1045 ns/op   |   472 B/op  |   13 allocs/op   |
@@ -70,6 +73,7 @@ go test -benchmem -run XXX -bench .
 |BenchmarkArea_Fit-8   |   683202   |   1816 ns/op   |   720 B/op   |   24 allocs/op   |
 |BenchmarkArea_Intersects-8   |   971000   |   1255 ns/op   |   480 B/op   |   16 allocs/op   |
 |BenchmarkArea_Split-8   |   277064   |   3703 ns/op   |   1464 B/op   |   44 allocs/op   |
+-->
 
 ## TODO
 
