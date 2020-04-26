@@ -311,9 +311,6 @@ func TestBox_Equal(t *testing.T) {
 	type fields struct {
 		Min                  *Vector3
 		Max                  *Vector3
-		XXX_NoUnkeyedLiteral struct{}
-		XXX_unrecognized     []byte
-		XXX_sizecache        int32
 	}
 	type args struct {
 		other Box
@@ -347,9 +344,6 @@ func TestBox_Equal(t *testing.T) {
 			b := Box{
 				Min:                  tt.fields.Min,
 				Max:                  tt.fields.Max,
-				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
-				XXX_unrecognized:     tt.fields.XXX_unrecognized,
-				XXX_sizecache:        tt.fields.XXX_sizecache,
 			}
 			if got := b.Equal(tt.args.other); got != tt.want {
 				t.Errorf("Equal() = %v, want %v", got, tt.want)
@@ -362,9 +356,6 @@ func TestBox_Fit1(t *testing.T) {
 	type fields struct {
 		Min                  *Vector3
 		Max                  *Vector3
-		XXX_NoUnkeyedLiteral struct{}
-		XXX_unrecognized     []byte
-		XXX_sizecache        int32
 	}
 	type args struct {
 		o Box
@@ -398,9 +389,6 @@ func TestBox_Fit1(t *testing.T) {
 			b := Box{
 				Min:                  tt.fields.Min,
 				Max:                  tt.fields.Max,
-				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
-				XXX_unrecognized:     tt.fields.XXX_unrecognized,
-				XXX_sizecache:        tt.fields.XXX_sizecache,
 			}
 			if got := b.Fit(tt.args.o); got != tt.want {
 				t.Errorf("Fit() = %v, want %v", got, tt.want)
@@ -413,9 +401,6 @@ func TestBox_GetCenter(t *testing.T) {
 	type fields struct {
 		Min                  *Vector3
 		Max                  *Vector3
-		XXX_NoUnkeyedLiteral struct{}
-		XXX_unrecognized     []byte
-		XXX_sizecache        int32
 	}
 	tests := []struct {
 		name   string
@@ -436,9 +421,6 @@ func TestBox_GetCenter(t *testing.T) {
 			b := Box{
 				Min:                  tt.fields.Min,
 				Max:                  tt.fields.Max,
-				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
-				XXX_unrecognized:     tt.fields.XXX_unrecognized,
-				XXX_sizecache:        tt.fields.XXX_sizecache,
 			}
 			if got := b.GetCenter(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetCenter() = %v, want %v", got, tt.want)
@@ -451,9 +433,6 @@ func TestBox_GetSize(t *testing.T) {
 	type fields struct {
 		Min                  *Vector3
 		Max                  *Vector3
-		XXX_NoUnkeyedLiteral struct{}
-		XXX_unrecognized     []byte
-		XXX_sizecache        int32
 	}
 	tests := []struct {
 		name   string
@@ -474,9 +453,6 @@ func TestBox_GetSize(t *testing.T) {
 			b := &Box{
 				Min:                  tt.fields.Min,
 				Max:                  tt.fields.Max,
-				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
-				XXX_unrecognized:     tt.fields.XXX_unrecognized,
-				XXX_sizecache:        tt.fields.XXX_sizecache,
 			}
 			if got := b.GetSize(); !got.Equal(tt.want) {
 				t.Errorf("GetSize() = %v, want %v", got, tt.want)
@@ -489,9 +465,6 @@ func TestBox_Intersects1(t *testing.T) {
 	type fields struct {
 		Min                  *Vector3
 		Max                  *Vector3
-		XXX_NoUnkeyedLiteral struct{}
-		XXX_unrecognized     []byte
-		XXX_sizecache        int32
 	}
 	type args struct {
 		b2 Box
@@ -517,9 +490,6 @@ func TestBox_Intersects1(t *testing.T) {
 			b := Box{
 				Min:                  tt.fields.Min,
 				Max:                  tt.fields.Max,
-				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
-				XXX_unrecognized:     tt.fields.XXX_unrecognized,
-				XXX_sizecache:        tt.fields.XXX_sizecache,
 			}
 			if got := b.Intersects(tt.args.b2); got != tt.want {
 				t.Errorf("Intersects() = %v, want %v", got, tt.want)
@@ -528,45 +498,39 @@ func TestBox_Intersects1(t *testing.T) {
 	}
 }
 
-func TestBox_Split1(t *testing.T) {
-	type fields struct {
-		Min                  *Vector3
-		Max                  *Vector3
-		XXX_NoUnkeyedLiteral struct{}
-		XXX_unrecognized     []byte
-		XXX_sizecache        int32
-	}
-	tests := []struct {
-		name   string
-		fields fields
-		want   [8]*Box
-	}{
-		// TODO: Add test cases.
-		{
-			fields:fields{
-				Min:                  NewVector3(0, 0, 0),
-				Max:                  NewVector3(1, 1, 1),
-			},
-			want: [8]*Box{
-				// TODO
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			b := &Box{
-				Min:                  tt.fields.Min,
-				Max:                  tt.fields.Max,
-				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
-				XXX_unrecognized:     tt.fields.XXX_unrecognized,
-				XXX_sizecache:        tt.fields.XXX_sizecache,
-			}
-			if got := b.Split(); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Split() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
+//func TestBox_Split1(t *testing.T) {
+//	type fields struct {
+//		Min                  *Vector3
+//		Max                  *Vector3
+//	}
+//	tests := []struct {
+//		name   string
+//		fields fields
+//		want   [8]*Box
+//	}{
+//		// TODO: Add test cases.
+//		{
+//			fields:fields{
+//				Min:                  NewVector3(0, 0, 0),
+//				Max:                  NewVector3(1, 1, 1),
+//			},
+//			want: [8]*Box{
+//				// TODO
+//			},
+//		},
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			b := &Box{
+//				Min:                  tt.fields.Min,
+//				Max:                  tt.fields.Max,
+//			}
+//			if got := b.Split(); !reflect.DeepEqual(got, tt.want) {
+//				t.Errorf("Split() = %v, want %v", got, tt.want)
+//			}
+//		})
+//	}
+//}
 
 func TestNewBoxMinMax(t *testing.T) {
 	type args struct {

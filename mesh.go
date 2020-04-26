@@ -52,6 +52,7 @@ func NewMeshSquareCuboid(sideLength float64, centerBased bool) *Mesh {
 	return &Mesh{Vertices: vertices, Tris: cuboidTris()}
 }
 
+// NewMeshRectangularCuboid return a mesh forming a rectangular cuboid
 func NewMeshRectangularCuboid(center, size Vector3) *Mesh {
 	var vertices []*Vector3
 	halfSize := size.Times(0.5)

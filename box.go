@@ -55,26 +55,26 @@ func (b Box) Intersects(b2 Box) bool {
 func (b *Box) Split() [8]*Box {
 	center := b.GetCenter()
 	return [8]*Box{
-		NewBoxMinMax(b.Max.X, b.Max.Y, b.Max.Z, center.X, center.Y, center.Z),
-		NewBoxMinMax(center.X, b.Max.Y, b.Max.Z, b.Min.X, center.Y, center.Z),
-		NewBoxMinMax(center.X, center.Y, b.Max.Z, b.Min.X, b.Min.Y, center.Z),
-		NewBoxMinMax(b.Max.X, center.Y, b.Max.Z, center.X, b.Min.Y, center.Z),
+		NewBoxMinMax(center.X, center.Y, center.Z, b.Max.X, b.Max.Y, b.Max.Z),
+		NewBoxMinMax(b.Min.X, center.Y, center.Z, center.X, b.Max.Y, b.Max.Z),
+		NewBoxMinMax(b.Min.X, b.Min.Y, center.Z, center.X, center.Y, b.Max.Z),
+		NewBoxMinMax(center.X, b.Min.Y, center.Z, b.Max.X, center.Y, b.Max.Z),
 
-		NewBoxMinMax(b.Max.X, b.Max.Y, center.Z, center.X, center.Y, b.Min.Z),
-		NewBoxMinMax(center.X, b.Max.Y, center.Z, b.Min.X, center.Y, b.Min.Z),
-		NewBoxMinMax(center.X, center.Y, center.Z, b.Min.X, b.Min.Y, b.Min.Z),
-		NewBoxMinMax(b.Max.X, center.Y, center.Z, center.X, b.Min.Y, b.Min.Z),
+		NewBoxMinMax(center.X, center.Y, b.Min.Z, b.Max.X, b.Max.Y, center.Z),
+		NewBoxMinMax(b.Min.X, center.Y, b.Min.Z, center.X, b.Max.Y, center.Z),
+		NewBoxMinMax(b.Min.X, b.Min.Y, b.Min.Z, center.X, center.Y, center.Z),
+		NewBoxMinMax(center.X, b.Min.Y, b.Min.Z, b.Max.X, center.Y, center.Z),
 	}
 	//return [8]*Box{
-	//	{Center: b.Center.Plus(*NewVector3(-q, q, -q)), Extents: newExtents},
-	//	{Center: b.Center.Plus(*NewVector3(q, q, -q)), Extents: newExtents},
-	//	{Center: b.Center.Plus(*NewVector3(-q, q, q)), Extents: newExtents},
-	//	{Center: b.Center.Plus(*NewVector3(q, q, q)), Extents: newExtents},
+	//	NewBoxMinMax(b.Max.X, b.Max.Y, b.Max.Z, center.X, center.Y, center.Z),
+	//	NewBoxMinMax(center.X, b.Max.Y, b.Max.Z, b.Min.X, center.Y, center.Z),
+	//	NewBoxMinMax(center.X, center.Y, b.Max.Z, b.Min.X, b.Min.Y, center.Z),
+	//	NewBoxMinMax(b.Max.X, center.Y, b.Max.Z, center.X, b.Min.Y, center.Z),
 	//
-	//	{Center: b.Center.Plus(*NewVector3(-q, -q, -q)), Extents: newExtents},
-	//	{Center: b.Center.Plus(*NewVector3(q, -q, -q)), Extents: newExtents},
-	//	{Center: b.Center.Plus(*NewVector3(-q, -q, q)), Extents: newExtents},
-	//	{Center: b.Center.Plus(*NewVector3(q, -q, q)), Extents: newExtents},
+	//	NewBoxMinMax(b.Max.X, b.Max.Y, center.Z, center.X, center.Y, b.Min.Z),
+	//	NewBoxMinMax(center.X, b.Max.Y, center.Z, b.Min.X, center.Y, b.Min.Z),
+	//	NewBoxMinMax(center.X, center.Y, center.Z, b.Min.X, b.Min.Y, b.Min.Z),
+	//	NewBoxMinMax(b.Max.X, center.Y, center.Z, center.X, b.Min.Y, b.Min.Z),
 	//}
 }
 

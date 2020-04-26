@@ -128,7 +128,7 @@ func (v *Vector3) Scale(m float64) {
 	v.Z *= m
 }
 
-// Divide, will obviously panic in case of division by 0
+// Divide will obviously panic in case of division by 0
 // In-place
 func (v *Vector3) Divide(m float64) {
 	v.X /= m
