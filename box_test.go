@@ -159,8 +159,8 @@ func TestBox_Split(t *testing.T) {
 
 	/*
 		Representation (ignoring the Z axis cause it's hard to draw in 3D ;))
-			centered at 0.5,0.5,0.5
-			0.5,0.5,0.5 extent (cubic)
+			centered at 0.5,0.5,0
+			0.5,0.5,0 extent (square)
 			--->
 		 _ _ _ _
 		|		|
@@ -169,65 +169,71 @@ func TestBox_Split(t *testing.T) {
 		------->
 		1 size
 		min 0,0,0
-		max 0,0,0
+		max 1,1,0
 
 		So in theory the split-ed box would be
 
-		Each sub-box extent: 0.25
+		Each sub-box extent: 0.25,0.25,0
 		 ->
 		 _ _ _ _
 		|_A_|_B_|
 		|_D_|_C_|
 
 		--->
-		Each sub-box size: 0.5
-		A sub-box:
-		center: 0.25,0.75,0.25
-		min: 0,0.5,0
-		max: 0.5,1,0.5
+		Each sub-box size: 0.5,0.5,0
+
+		- - - - - - - - - - - - - - - - - - - - - - - - - - |
+		B:						|		D:					|
+		center: 0.25,0.75,0		|		center: 0.75,0.75,0 |
+		min: 0,0.5,0			|		min: 0.5,0.5,0		|
+		max: 0.5,1,0			|		max: 1,1,0			|
+		- - - - - - - - - - - - - - - - - - - - - - - - - - |
+		A:						|		C:					|
+		center: 0.25,0.25,0		|		center: 0.75,0.25,0 |
+		min: 0,0,0				|		min: 0.5,0,0		|
+		max: 0.5,0.5,0			|		max: 1,0.5,0		|
+		- - - - - - - - - - - - - - - - - - - - - - - - - - |
 		...
 	 */
-	//b := Box{
-	//	Center: &Vector3{
-	//		Dimensions: []float64{0.5, 0.5, 0.5},
-	//	},
-	//	Extents: &Vector3{
-	//		Dimensions:[]float64{0.5, 0.5, 0.5},
-	//	},
-	//}
-	//got := b.Split()
-	//
-	//childExtents := b.Extents.Scale(0.5)
-	//want := [8]*Box{
-	//	{Center: &Vector3{Dimensions: []float64{0.25, 0.75, 0.25}}, Extents: childExtents},
-	//	{Center: &Vector3{Dimensions: []float64{0.75, 0.75, 0.25}}, Extents: childExtents},
-	//	{Center: &Vector3{Dimensions: []float64{0.25, 0.75, 0.75}}, Extents: childExtents},
-	//	{Center: &Vector3{Dimensions: []float64{0.75, 0.75, 0.75}}, Extents: childExtents},
-	//
-	//	{Center: &Vector3{Dimensions: []float64{0.25, 0.25, 0.25}}, Extents: childExtents},
-	//	{Center: &Vector3{Dimensions: []float64{0.75, 0.25, 0.25}}, Extents: childExtents},
-	//	{Center: &Vector3{Dimensions: []float64{0.25, 0.25, 0.75}}, Extents: childExtents},
-	//	{Center: &Vector3{Dimensions: []float64{0.75, 0.25, 0.75}}, Extents: childExtents},
-	//}
-	//
-	//tester := func(got, want [8]*Box) {
-	//	t.Logf("\nBefore split \n%v", b)
-	//	for i := range want {
-	//		t.Logf("\nMin%v\nWant%v\n\nMax%v\nWant%v\n\nCenter%v\nWant%v\n\nExtents%v\nWant%v\n",
-	//			got[i].GetMin(),
-	//			want[i].GetMin(),
-	//			got[i].GetMax(),
-	//			want[i].GetMax(),
-	//			got[i].Center,
-	//			want[i].Center,
-	//			got[i].Extents,
-	//			want[i].Extents,
-	//		)
-	//		Equals(t, want[i].Center, got[i].Center)
-	//		Equals(t, want[i].Extents, got[i].Extents)
-	//	}
-	//}
-	//tester(got, want)
+	b := Box{
+		Min: NewVector3(0, 0, 0),
+		Max: NewVector3(1, 1, 0),
+	}
+	got := b.Split()
+
+
+	/*
+	 *    3____7
+	 *  2/___6/|
+	 *  | 1__|_5
+	 *  0/___4/
+	*/
+	want := [8]*Box{
+		{Min: NewVector3(0, 0, 0), Max: NewVector3(0.5, 0.5, 0)}, // A
+		{Min: NewVector3(0, 0, 0), Max: NewVector3(0.5, 0.5, 0)}, // A
+		{Min: NewVector3(0, 0.5, 0), Max: NewVector3(0.5, 1, 0)}, // B
+		{Min: NewVector3(0, 0.5, 0), Max: NewVector3(0.5, 1, 0)}, // B
+
+		{Min: NewVector3(0.5, 0, 0), Max: NewVector3(1, 0.5, 0)}, // C
+		{Min: NewVector3(0.5, 0, 0), Max: NewVector3(1, 0.5, 0)}, // C
+		{Min: NewVector3(0.5, 0.5, 0), Max: NewVector3(1, 1, 0)}, // D
+		{Min: NewVector3(0.5, 0.5, 0), Max: NewVector3(1, 1, 0)}, // D
+	}
+
+	tester := func(got, want [8]*Box) {
+		t.Logf("\nBefore split \n%v", b)
+		for i := range want {
+			t.Logf("\nMin: {%v}\nWant: {%v}\n\nMax: {%v}\nWant: {%v}",
+				got[i].Min,
+				want[i].Min,
+				got[i].Max,
+				want[i].Max,
+			)
+			Equals(t, want[i].Min, got[i].Min)
+			Equals(t, want[i].Max, got[i].Max)
+		}
+	}
+	tester(got, want)
 }
 
 func BenchmarkArea_NewBoxMinMax(b *testing.B) {

@@ -226,3 +226,8 @@ func (v Vector3) LookAt(b Vector3) Quaternion {
 	angle := v.Angle(b)
 	return *NewQuaternion(0, angle, 0, angle)
 }
+
+// Mutate returns a new Vector3 with each coordinates multiplied by a random value between -rate and rate
+func (v Vector3) Mutate(rate float64) Vector3 {
+	return *NewVector3(v.X*randFloat(-rate, rate), v.Y*randFloat(-rate, rate), v.Z*randFloat(-rate, rate))
+}

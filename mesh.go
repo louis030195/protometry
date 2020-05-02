@@ -87,6 +87,27 @@ func (m *Mesh) Average(other Volume) Volume {
 }
 
 // Mutate create a new mesh with random mutations
+// Not in-place
 func (m *Mesh) Mutate(rate float64) Volume {
-	return nil
+	newMesh := m.Clone()
+	for i := range newMesh.Vertices {
+		v := newMesh.Vertices[i].Mutate(rate)
+		newMesh.Vertices = append(newMesh.Vertices, &v)
+	}
+	return newMesh
+}
+
+func (m *Mesh) Clone() *Mesh {
+	c := m.Center
+	v := m.Vertices
+	t := m.Tris
+	n := m.Normals
+	u := m.Uvs
+	return &Mesh{
+		Center:               c,
+		Vertices:             v,
+		Tris:                 t,
+		Normals:              n,
+		Uvs:                  u,
+	}
 }

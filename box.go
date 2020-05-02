@@ -51,30 +51,35 @@ func (b Box) Intersects(b2 Box) bool {
 }
 
 
-// Split split a CUBE into sub-cubes
+/* Split split a CUBE into 8 cubes
+ *    3____7
+ *  2/___6/|
+ *  | 1__|_5
+ *  0/___4/
+ */
 func (b *Box) Split() [8]*Box {
 	center := b.GetCenter()
 	return [8]*Box{
-		NewBoxMinMax(center.X, center.Y, center.Z, b.Max.X, b.Max.Y, b.Max.Z),
-		NewBoxMinMax(b.Min.X, center.Y, center.Z, center.X, b.Max.Y, b.Max.Z),
-		NewBoxMinMax(b.Min.X, b.Min.Y, center.Z, center.X, center.Y, b.Max.Z),
-		NewBoxMinMax(center.X, b.Min.Y, center.Z, b.Max.X, center.Y, b.Max.Z),
-
-		NewBoxMinMax(center.X, center.Y, b.Min.Z, b.Max.X, b.Max.Y, center.Z),
-		NewBoxMinMax(b.Min.X, center.Y, b.Min.Z, center.X, b.Max.Y, center.Z),
 		NewBoxMinMax(b.Min.X, b.Min.Y, b.Min.Z, center.X, center.Y, center.Z),
+		NewBoxMinMax(b.Min.X, b.Min.Y, center.Z, center.X, center.Y, b.Max.Z),
+		NewBoxMinMax(b.Min.X, center.Y, b.Min.Z, center.X, b.Max.Y, center.Z),
+		NewBoxMinMax(b.Min.X, center.Y, center.Z, center.X, b.Max.Y, b.Max.Z),
+
 		NewBoxMinMax(center.X, b.Min.Y, b.Min.Z, b.Max.X, center.Y, center.Z),
+		NewBoxMinMax(center.X, b.Min.Y, center.Z, b.Max.X, center.Y, b.Max.Z),
+		NewBoxMinMax(center.X, center.Y, b.Min.Z, b.Max.X, b.Max.Y, center.Z),
+		NewBoxMinMax(center.X, center.Y, center.Z, b.Max.X, b.Max.Y, b.Max.Z),
 	}
 	//return [8]*Box{
-	//	NewBoxMinMax(b.Max.X, b.Max.Y, b.Max.Z, center.X, center.Y, center.Z),
-	//	NewBoxMinMax(center.X, b.Max.Y, b.Max.Z, b.Min.X, center.Y, center.Z),
-	//	NewBoxMinMax(center.X, center.Y, b.Max.Z, b.Min.X, b.Min.Y, center.Z),
-	//	NewBoxMinMax(b.Max.X, center.Y, b.Max.Z, center.X, b.Min.Y, center.Z),
+	//	NewBoxMinMax(center.X, center.Y, center.Z, b.Max.X, b.Max.Y, b.Max.Z),
+	//	NewBoxMinMax(b.Min.X, center.Y, center.Z, center.X, b.Max.Y, b.Max.Z),
+	//	NewBoxMinMax(b.Min.X, b.Min.Y, center.Z, center.X, center.Y, b.Max.Z),
+	//	NewBoxMinMax(center.X, b.Min.Y, center.Z, b.Max.X, center.Y, b.Max.Z),
 	//
-	//	NewBoxMinMax(b.Max.X, b.Max.Y, center.Z, center.X, center.Y, b.Min.Z),
-	//	NewBoxMinMax(center.X, b.Max.Y, center.Z, b.Min.X, center.Y, b.Min.Z),
-	//	NewBoxMinMax(center.X, center.Y, center.Z, b.Min.X, b.Min.Y, b.Min.Z),
-	//	NewBoxMinMax(b.Max.X, center.Y, center.Z, center.X, b.Min.Y, b.Min.Z),
+	//	NewBoxMinMax(center.X, center.Y, b.Min.Z, b.Max.X, b.Max.Y, center.Z),
+	//	NewBoxMinMax(b.Min.X, center.Y, b.Min.Z, center.X, b.Max.Y, center.Z),
+	//	NewBoxMinMax(b.Min.X, b.Min.Y, b.Min.Z, center.X, center.Y, center.Z),
+	//	NewBoxMinMax(center.X, b.Min.Y, b.Min.Z, b.Max.X, center.Y, center.Z),
 	//}
 }
 
