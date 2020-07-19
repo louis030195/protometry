@@ -1,7 +1,7 @@
 package protometry
 
 import (
-	"math"
+    "math"
 )
 
 // NewQuaternion constructs a Vector3

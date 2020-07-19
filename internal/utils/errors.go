@@ -1,7 +1,7 @@
-package protometry
+package utils
 
 import (
-	"errors"
+    "errors"
 )
 
 var (

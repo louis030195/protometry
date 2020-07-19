@@ -1,8 +1,8 @@
 package protometry
 
 import (
-	"math"
-	"math/rand"
+    "math"
+    "math/rand"
 )
 
 // NewVector3 constructs a Vector3
@@ -70,8 +70,9 @@ func (v Vector3) Normalize() Vector3 {
 }
 
 // Abs returns the vector with non-negative components.
-func (v *Vector3) Abs() *Vector3 {
-	return NewVector3(math.Abs(v.X), math.Abs(v.Y), math.Abs(v.Z))
+func (v *Vector3) Abs() Vector3 {
+	nv := NewVector3(math.Abs(v.X), math.Abs(v.Y), math.Abs(v.Z))
+	return *nv
 }
 
 // Plus returns the standard vector sum of v1 and v2.

@@ -1,8 +1,9 @@
 package protometry
 
 import (
-	"reflect"
-	"testing"
+    "github.com/louis030195/protometry/internal/utils"
+    "reflect"
+    "testing"
 )
 
 
@@ -11,35 +12,35 @@ func TestBox_Fit(t *testing.T) {
 	b := NewBoxOfSize(0.5, 0.5, 0.5, 1)
 
 	// contains equal Box, symmetrically
-	Equals(t, true, a.Fit(*b))
+	utils.Equals(t, true, a.Fit(*b))
 
-	Equals(t, true, b.Fit(*b))
+	utils.Equals(t, true, b.Fit(*b))
 
 	// contained on edge
 	b = NewBoxMinMax(0, 0, 0, 0.5, 1, 1)
 
-	Equals(t, true, b.Fit(*a))
+	utils.Equals(t, true, b.Fit(*a))
 
-	Equals(t, false, a.Fit(*b))
+	utils.Equals(t, false, a.Fit(*b))
 
 	// contained away from edges
 	b = NewBoxMinMax(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
-	Equals(t, true, b.Fit(*a))
+	utils.Equals(t, true, b.Fit(*a))
 
-	Equals(t, false, a.Fit(*b))
+	utils.Equals(t, false, a.Fit(*b))
 
 	// 1 corner Fit
 	b = NewBoxMinMax(-0.1, -0.1, -0.1, 0.9, 0.9, 0.9)
 
-	Equals(t, false, b.Fit(*a))
+	utils.Equals(t, false, b.Fit(*a))
 
-	Equals(t, false, a.Fit(*b))
+	utils.Equals(t, false, a.Fit(*b))
 
 	b = NewBoxMinMax(0.9, 0.9, 0.9, 1.1, 1.1, 1.1)
 
-	Equals(t, false, b.Fit(*a))
+	utils.Equals(t, false, b.Fit(*a))
 
-	Equals(t, false, a.Fit(*b))
+	utils.Equals(t, false, a.Fit(*b))
 }
 
 func TestBox_Intersects(t *testing.T) {
@@ -49,98 +50,98 @@ func TestBox_Intersects(t *testing.T) {
 
 
 	// not intersecting area above or below in each dimension
-	Equals(t, false, a.Intersects(*b))
+	utils.Equals(t, false, a.Intersects(*b))
 
 	b = NewBoxMinMax(-1, 0, 0, -0.1, 1, 1)
 
-	Equals(t, false, a.Intersects(*b))
+	utils.Equals(t, false, a.Intersects(*b))
 
 	b = NewBoxMinMax(0, 1.1, 0, 1, 2, 1)
 
-	Equals(t, false, a.Intersects(*b))
+	utils.Equals(t, false, a.Intersects(*b))
 
 	b = NewBoxMinMax(0, -1, 0, 1, -0.1, 1)
 
-	Equals(t, false, a.Intersects(*b))
+	utils.Equals(t, false, a.Intersects(*b))
 
 	b = NewBoxMinMax(0, 0, 1.1, 1, 1, 2)
 
-	Equals(t, false, a.Intersects(*b))
+	utils.Equals(t, false, a.Intersects(*b))
 
 	b = NewBoxMinMax(0, 0, -1, 1, 1, -0.1)
 
-	Equals(t, false, a.Intersects(*b))
+	utils.Equals(t, false, a.Intersects(*b))
 
 	// intersects equal Box, symmetrically
 	b = NewBoxMinMax(0, 0, 0, 1, 1, 1)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	// intersects containing and contained
 	b = NewBoxMinMax(0.1, 0.1, 0.1, 0.9, 0.9, 0.9)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	// intersects partial containment on each corner
 	b = NewBoxMinMax(0.9, 0.9, 0.9, 2, 2, 2)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	b = NewBoxMinMax(-1, 0.9, 0.9, 1, 2, 2)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	b = NewBoxMinMax(0.9, -1, 0.9, 2, 0.1, 2)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	b = NewBoxMinMax(-1, -1, 0.9, 0.1, 0.1, 2)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	b = NewBoxMinMax(0.9, 0.9, -1, 2, 2, 0.1)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	b = NewBoxMinMax(-1, 0.9, -1, 0.1, 2, 0.1)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	b = NewBoxMinMax(0.9, -1, -1, 2, 0.1, 0.1)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	b = NewBoxMinMax(-1, -1, -1, 0.1, 0.1, 0.1)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	// intersects 'beam'; where no corners Fit
 	// other but some contained
 	b = NewBoxMinMax(-1, 0.1, 0.1, 2, 0.9, 0.9)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	b = NewBoxMinMax(0.1, -1, 0.1, 0.9, 2, 0.9)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	b = NewBoxMinMax(0.1, 0.1, -1, 0.9, 0.9, 2)
 
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, a.Intersects(*b))
 
 	// Other
 	b = NewBoxMinMax(1, 1, 1, 4, 4, 4)
 
 	b = NewBoxMinMax(0, 0, 0, 1, 1, 1)
 
-	Equals(t, true, b.Intersects(*a))
-	Equals(t, true, a.Intersects(*b))
+	utils.Equals(t, true, b.Intersects(*a))
+	utils.Equals(t, true, a.Intersects(*b))
 	b = NewBoxMinMax(1, 1, 1, 1, 1, 1)
 
-	Equals(t, true, b.Intersects(*a))
+	utils.Equals(t, true, b.Intersects(*a))
 	b = NewBoxMinMax(1, 1, 1, 4, 4, 4)
 
-	Equals(t, true, b.Intersects(*a))
+	utils.Equals(t, true, b.Intersects(*a))
 }
 
 func TestBox_Split(t *testing.T) {
@@ -229,8 +230,8 @@ func TestBox_Split(t *testing.T) {
 				got[i].Max,
 				want[i].Max,
 			)
-			Equals(t, want[i].Min, got[i].Min)
-			Equals(t, want[i].Max, got[i].Max)
+			utils.Equals(t, want[i].Min, got[i].Min)
+			utils.Equals(t, want[i].Max, got[i].Max)
 		}
 	}
 	tester(got, want)
@@ -330,16 +331,16 @@ func TestBox_Equal(t *testing.T) {
 		// TODO: Add test cases.
 		{
 			fields:fields{
-				Min:                  NewVector3(0, 0, 0),
-				Max:                  NewVector3(1, 1, 1),
+				Min: NewVector3(0, 0, 0),
+				Max: NewVector3(1, 1, 1),
 			},
 			args:args{other: *NewBoxMinMax(0, 0, 0, 1, 1, 1)},
 			want: true,
 		},
 		{
 			fields:fields{
-				Min:                  NewVector3(0, 0, 0),
-				Max:                  NewVector3(1.1, 1, 1),
+				Min: NewVector3(0, 0, 0),
+				Max: NewVector3(1.1, 1, 1),
 			},
 			args:args{other: *NewBoxMinMax(0, 0, 0, 1, 1, 1)},
 			want: false,
@@ -375,16 +376,16 @@ func TestBox_Fit1(t *testing.T) {
 		// TODO: Add test cases.
 		{
 			fields:fields{
-				Min:                  NewVector3(0.5, 0.5, 0.5),
-				Max:                  NewVector3(0.6, 0.6, 0.6),
+				Min: NewVector3(0.5, 0.5, 0.5),
+				Max: NewVector3(0.6, 0.6, 0.6),
 			},
 			args:args{o: *NewBoxMinMax(0.5, 0.5, 0.5, 1, 1, 1)},
 			want: true,
 		},
 		{
 			fields:fields{
-				Min:                  NewVector3(5.85, -3.9, 5.2),
-				Max:                  NewVector3(6.85, -2.9, 6.2),
+				Min: NewVector3(5.85, -3.9, 5.2),
+				Max: NewVector3(6.85, -2.9, 6.2),
 			},
 			args:args{o: *NewBoxMinMax(2.92, -1.9, 2.59, 10.3, -4.4, 9.3)},
 			want: false,
@@ -416,8 +417,8 @@ func TestBox_GetCenter(t *testing.T) {
 		// TODO: Add test cases.
 		{
 			fields:fields{
-				Min:                  NewVector3(0.5, 0.5, 0.5),
-				Max:                  NewVector3(0.6, 0.6, 0.6),
+				Min: NewVector3(0.5, 0.5, 0.5),
+				Max: NewVector3(0.6, 0.6, 0.6),
 			},
 			want: *NewVector3(0.55, 0.55, 0.55),
 		},
@@ -448,8 +449,8 @@ func TestBox_GetSize(t *testing.T) {
 		// TODO: Add test cases.
 		{
 			fields:fields{
-				Min:                  NewVector3(0.5, 0.5, 0.5),
-				Max:                  NewVector3(0.6, 0.6, 0.6),
+				Min: NewVector3(0.5, 0.5, 0.5),
+				Max: NewVector3(0.6, 0.6, 0.6),
 			},
 			want: *NewVector3(0.1, 0.1, 0.1),
 		},
@@ -484,8 +485,8 @@ func TestBox_Intersects1(t *testing.T) {
 		// TODO: Add test cases.
 		{
 			fields:fields{
-				Min:                  NewVector3(0.5, 0.5, 0.5),
-				Max:                  NewVector3(0.6, 0.6, 0.6),
+				Min: NewVector3(0.5, 0.5, 0.5),
+				Max: NewVector3(0.6, 0.6, 0.6),
 			},
 			args:args{b2: *NewBoxMinMax(0.5, 0.5, 0.5, 1, 1, 1)},
 			want: true,
@@ -583,7 +584,7 @@ func TestNewBoxOfSize(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			args:args{0, 0, 0, 1},
+			args: args{0, 0, 0, 1},
 			want: NewBoxMinMax(-0.5, -0.5, -0.5, 0.5, 0.5, 0.5),
 		},
 	}
@@ -594,4 +595,125 @@ func TestNewBoxOfSize(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestBox_EncapsulateBox(t *testing.T) {
+    type fields struct {
+        Min                  *Vector3
+        Max                  *Vector3
+        XXX_NoUnkeyedLiteral struct{}
+        XXX_unrecognized     []byte
+        XXX_sizecache        int32
+    }
+    type args struct {
+        o Box
+    }
+    tests := []struct {
+        name   string
+        fields fields
+        args   args
+        want   *Box
+    }{
+        // TODO: Add test cases.
+        {
+            fields: fields{
+                Min: &Vector3{
+                    X:                    0,
+                    Y:                    0,
+                    Z:                    0,
+                },
+                Max: &Vector3{
+                    X:                    1,
+                    Y:                    1,
+                    Z:                    1,
+                },
+            },
+            args:args{
+                o: Box{
+                Min: &Vector3{
+                    X:                    1,
+                    Y:                    1,
+                    Z:                    1,
+                },
+                Max: &Vector3{
+                    X:                    2,
+                    Y:                    2,
+                    Z:                    2,
+                },
+            },
+            },
+            want: NewBoxMinMax(0, 0, 0, 2, 2, 2),
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            b := &Box{
+                Min:                  tt.fields.Min,
+                Max:                  tt.fields.Max,
+                XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
+                XXX_unrecognized:     tt.fields.XXX_unrecognized,
+                XXX_sizecache:        tt.fields.XXX_sizecache,
+            }
+            if got := b.EncapsulateBox(tt.args.o); !reflect.DeepEqual(got, tt.want) {
+                t.Errorf("EncapsulateBox() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
+
+func TestBox_EncapsulatePoint(t *testing.T) {
+    type fields struct {
+        Min                  *Vector3
+        Max                  *Vector3
+        XXX_NoUnkeyedLiteral struct{}
+        XXX_unrecognized     []byte
+        XXX_sizecache        int32
+    }
+    type args struct {
+        o Vector3
+    }
+    tests := []struct {
+        name   string
+        fields fields
+        args   args
+        want   *Box
+    }{
+        // TODO: Add test cases.
+        {
+            fields: fields{
+                Min: &Vector3{
+                    X:                    0,
+                    Y:                    0,
+                    Z:                    0,
+                },
+                Max: &Vector3{
+                    X:                    1,
+                    Y:                    1,
+                    Z:                    1,
+                },
+            },
+            args:args{
+                o: Vector3{
+                        X:                    2,
+                        Y:                    2,
+                        Z:                    2,
+                    },
+            },
+            want: NewBoxMinMax(0, 0, 0, 2, 2, 2),
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            b := &Box{
+                Min:                  tt.fields.Min,
+                Max:                  tt.fields.Max,
+                XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
+                XXX_unrecognized:     tt.fields.XXX_unrecognized,
+                XXX_sizecache:        tt.fields.XXX_sizecache,
+            }
+            if got := b.EncapsulatePoint(tt.args.o); !reflect.DeepEqual(got, tt.want) {
+                t.Errorf("EncapsulatePoint() = %v, want %v", got, tt.want)
+            }
+        })
+    }
 }

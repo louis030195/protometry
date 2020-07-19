@@ -24,28 +24,28 @@ func NewMeshSquareCuboid(sideLength float64, centerBased bool) *Mesh {
 	if centerBased {
 		halfSide := sideLength / 2
 		vertices = []*Vector3{
-			NewVector3(-halfSide, -halfSide, -halfSide),
-			NewVector3(halfSide, -halfSide, -halfSide),
-			NewVector3(halfSide, halfSide, -halfSide),
-			NewVector3(-halfSide, halfSide, -halfSide),
+            NewVector3(-halfSide, -halfSide, -halfSide),
+            NewVector3(halfSide, -halfSide, -halfSide),
+            NewVector3(halfSide, halfSide, -halfSide),
+            NewVector3(-halfSide, halfSide, -halfSide),
 
-			NewVector3(-halfSide, halfSide, halfSide),
-			NewVector3(halfSide, halfSide, halfSide),
-			NewVector3(halfSide, -halfSide, halfSide),
-			NewVector3(-halfSide, -halfSide, halfSide),
+            NewVector3(-halfSide, halfSide, halfSide),
+            NewVector3(halfSide, halfSide, halfSide),
+            NewVector3(halfSide, -halfSide, halfSide),
+            NewVector3(-halfSide, -halfSide, halfSide),
 		}
 
 	} else {
 		vertices = []*Vector3{
-			NewVector3(0, 0, 0),
-			NewVector3(sideLength, 0, 0),
-			NewVector3(sideLength, sideLength, 0),
-			NewVector3(0, sideLength, 0),
+            NewVector3(0, 0, 0),
+            NewVector3(sideLength, 0, 0),
+            NewVector3(sideLength, sideLength, 0),
+            NewVector3(0, sideLength, 0),
 
-			NewVector3(0, sideLength, sideLength),
-			NewVector3(sideLength, sideLength, sideLength),
-			NewVector3(sideLength, 0, sideLength),
-			NewVector3(0, 0, sideLength),
+            NewVector3(0, sideLength, sideLength),
+            NewVector3(sideLength, sideLength, sideLength),
+            NewVector3(sideLength, 0, sideLength),
+            NewVector3(0, 0, sideLength),
 		}
 	}
 
@@ -57,15 +57,15 @@ func NewMeshRectangularCuboid(center, size Vector3) *Mesh {
 	var vertices []*Vector3
 	halfSize := size.Times(0.5)
 	vertices = []*Vector3{
-		NewVector3(-halfSize.X, -halfSize.Y, -halfSize.Z),
-		NewVector3(halfSize.X, -halfSize.Y, -halfSize.Z),
-		NewVector3(halfSize.X, halfSize.Y, -halfSize.Z),
-		NewVector3(-halfSize.X, halfSize.Y, -halfSize.Z),
+        NewVector3(-halfSize.X, -halfSize.Y, -halfSize.Z),
+        NewVector3(halfSize.X, -halfSize.Y, -halfSize.Z),
+        NewVector3(halfSize.X, halfSize.Y, -halfSize.Z),
+        NewVector3(-halfSize.X, halfSize.Y, -halfSize.Z),
 
-		NewVector3(-halfSize.X, halfSize.Y, halfSize.Z),
-		NewVector3(halfSize.X, halfSize.Y, halfSize.Z),
-		NewVector3(halfSize.X, -halfSize.Y, halfSize.Z),
-		NewVector3(-halfSize.X, -halfSize.Y, halfSize.Z),
+        NewVector3(-halfSize.X, halfSize.Y, halfSize.Z),
+        NewVector3(halfSize.X, halfSize.Y, halfSize.Z),
+        NewVector3(halfSize.X, -halfSize.Y, halfSize.Z),
+        NewVector3(-halfSize.X, -halfSize.Y, halfSize.Z),
 	}
 
 	return &Mesh{Vertices: vertices, Tris: cuboidTris()}

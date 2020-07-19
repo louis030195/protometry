@@ -1,14 +1,15 @@
 package protometry
 
 import (
-	"reflect"
-	"testing"
+    "github.com/louis030195/protometry/internal/utils"
+    "reflect"
+    "testing"
 )
 
 func TestVector3_Lerp(t *testing.T) {
 	a := NewVector3(0, 0, 0)
 	b := NewVector3(1, 1, 1)
-	Equals(t, NewVector3(.5, .5, .5), a.Lerp(b, 0.5))
+	utils.Equals(t, NewVector3(.5, .5, .5), a.Lerp(b, 0.5))
 }
 
 func TestNewVector3Zero(t *testing.T) {
@@ -135,34 +136,34 @@ func TestMin(t *testing.T) {
 
 func TestVector3_In(t *testing.T) {
 	a := NewBoxOfSize(0.5, 0.5, 0.5, 1)
-	Equals(t, true, NewVector3(1, 1, 1).In(*a))
+	utils.Equals(t, true, NewVector3(1, 1, 1).In(*a))
 
-	Equals(t, true, NewVector3(0, 0, 0).In(*a))
+	utils.Equals(t, true, NewVector3(0, 0, 0).In(*a))
 
-	Equals(t, true, NewVector3(1, 0, 0).In(*a))
+	utils.Equals(t, true, NewVector3(1, 0, 0).In(*a))
 
-	Equals(t, true, NewVector3(0, 0, 1).In(*a))
+	utils.Equals(t, true, NewVector3(0, 0, 1).In(*a))
 
-	Equals(t, true, NewVector3(0.5, 0.5, 0.5).In(*a))
+	utils.Equals(t, true, NewVector3(0.5, 0.5, 0.5).In(*a))
 
-	Equals(t, false, NewVector3(-0.000001, 0.5, 0.5).In(*a))
+	utils.Equals(t, false, NewVector3(-0.000001, 0.5, 0.5).In(*a))
 
-	Equals(t, false, NewVector3(0.5, -0.000001, 0.5).In(*a))
+	utils.Equals(t, false, NewVector3(0.5, -0.000001, 0.5).In(*a))
 
-	Equals(t, false, NewVector3(0.5, 0.5, -0.000001).In(*a))
+	utils.Equals(t, false, NewVector3(0.5, 0.5, -0.000001).In(*a))
 
-	Equals(t, false, NewVector3(0.5, 1.000001, 0.5).In(*a))
+	utils.Equals(t, false, NewVector3(0.5, 1.000001, 0.5).In(*a))
 
-	Equals(t, false, NewVector3(0.5, 0.5, 1.000001).In(*a))
+	utils.Equals(t, false, NewVector3(0.5, 0.5, 1.000001).In(*a))
 }
 
 func TestVector3_Clone(t *testing.T) {
 	a := NewVector3(12, 4, 6)
 	b := a.Clone()
 	a.X = 27
-	Equals(t, 27., a.X)
+	utils.Equals(t, 27., a.X)
 	t.Logf("B: %v", b)
-	Equals(t, 12., b.X)
+	utils.Equals(t, 12., b.X)
 }
 
 func TestVector3_Minus(t *testing.T) {
@@ -170,18 +171,18 @@ func TestVector3_Minus(t *testing.T) {
 	b := NewVector3(-12, -4, -6)
 	c := a.Minus(*b)
 	// Check if properly NOT in-place
-	Equals(t, true, a.Equal(*NewVector3(12, 4, 6)))
-	Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
+	utils.Equals(t, true, a.Equal(*NewVector3(12, 4, 6)))
+	utils.Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
 
 	// And properly do the operation
-	Equals(t, true, c.Equal(*NewVector3(24, 8, 12)))
+	utils.Equals(t, true, c.Equal(*NewVector3(24, 8, 12)))
 }
 
 func TestVector3_Scale(t *testing.T) {
 	a := NewVector3(12, 4, 6)
 	a.Scale(2)
 	// Check if properly in-place
-	Equals(t, true, a.Equal(*NewVector3(24, 8, 12)))
+	utils.Equals(t, true, a.Equal(*NewVector3(24, 8, 12)))
 }
 
 func TestVector3_Subtract(t *testing.T) {
@@ -189,8 +190,8 @@ func TestVector3_Subtract(t *testing.T) {
 	b := NewVector3(-12, -4, -6)
 	a.Subtract(b)
 	// Check if properly in-place
-	Equals(t, true, a.Equal(*NewVector3(24, 8, 12)))
-	Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
+	utils.Equals(t, true, a.Equal(*NewVector3(24, 8, 12)))
+	utils.Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
 }
 
 func TestVector3_Times(t *testing.T) {
@@ -198,11 +199,11 @@ func TestVector3_Times(t *testing.T) {
 	b := NewVector3(-12, -4, -6)
 	c := a.Times(2)
 	// Check if properly NOT in-place
-	Equals(t, true, a.Equal(*NewVector3(12, 4, 6)))
-	Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
+	utils.Equals(t, true, a.Equal(*NewVector3(12, 4, 6)))
+	utils.Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
 
 	// And properly do the operation
-	Equals(t, true, c.Equal(*NewVector3(24, 8, 12)))
+	utils.Equals(t, true, c.Equal(*NewVector3(24, 8, 12)))
 }
 
 func TestVector3_Add(t *testing.T) {
@@ -210,8 +211,8 @@ func TestVector3_Add(t *testing.T) {
 	b := NewVector3(-12, -4, -6)
 	a.Add(b)
 	// Check if properly in-place
-	Equals(t, true, a.Equal(*NewVector3(0, 0, 0)))
-	Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
+	utils.Equals(t, true, a.Equal(*NewVector3(0, 0, 0)))
+	utils.Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
 }
 
 func TestVector3_Plus(t *testing.T) {
@@ -219,11 +220,11 @@ func TestVector3_Plus(t *testing.T) {
 	b := NewVector3(-12, -4, -6)
 	c := a.Plus(*b)
 	// Check if properly NOT in-place
-	Equals(t, true, a.Equal(*NewVector3(12, 4, 6)))
-	Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
+	utils.Equals(t, true, a.Equal(*NewVector3(12, 4, 6)))
+	utils.Equals(t, true, b.Equal(*NewVector3(-12, -4, -6)))
 
 	// And properly do the operation
-	Equals(t, true, c.Equal(*NewVector3(0, 0, 0)))
+	utils.Equals(t, true, c.Equal(*NewVector3(0, 0, 0)))
 }
 
 
