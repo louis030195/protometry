@@ -1,11 +1,12 @@
-package protometry
+package volume
 
 import (
-    "github.com/louis030195/protometry/internal/utils"
-    "reflect"
-    "testing"
+    "github.com/louis030195/protometry/api/vector3"
+	"github.com/louis030195/protometry/internal/utils"
+    "math/rand"
+	"reflect"
+	"testing"
 )
-
 
 func TestBox_Fit(t *testing.T) {
 	a := NewBoxOfSize(0.5, 0.5, 0.5, 1)
@@ -47,7 +48,6 @@ func TestBox_Intersects(t *testing.T) {
 	a := NewBoxMinMax(0, 0, 0, 1, 1, 1)
 
 	b := NewBoxMinMax(1.1, 0, 0, 2, 1, 1)
-
 
 	// not intersecting area above or below in each dimension
 	utils.Equals(t, false, a.Intersects(*b))
@@ -144,6 +144,21 @@ func TestBox_Intersects(t *testing.T) {
 	utils.Equals(t, true, b.Intersects(*a))
 }
 
+func TestBox_Contains(t *testing.T) {
+	a := NewBoxOfSize(0.5, 0.5, 0.5, 1)
+	utils.Equals(t, true, a.Contains(*vector3.NewVector3(1, 1, 1)))
+	utils.Equals(t, true, a.Contains(*vector3.NewVector3(0, 0, 0)))
+	utils.Equals(t, true, a.Contains(*vector3.NewVector3(1, 0, 0)))
+	utils.Equals(t, true, a.Contains(*vector3.NewVector3(0, 0, 1)))
+	utils.Equals(t, true, a.Contains(*vector3.NewVector3(0.5, 0.5, 0.5)))
+
+	utils.Equals(t, false, a.Contains(*vector3.NewVector3(-0.000001, 0.5, 0.5)))
+	utils.Equals(t, false, a.Contains(*vector3.NewVector3(0.5, -0.000001, 0.5)))
+	utils.Equals(t, false, a.Contains(*vector3.NewVector3(0.5, 0.5, -0.000001)))
+	utils.Equals(t, false, a.Contains(*vector3.NewVector3(0.5, 1.000001, 0.5)))
+	utils.Equals(t, false, a.Contains(*vector3.NewVector3(0.5, 0.5, 1.000001)))
+}
+
 func TestBox_Split(t *testing.T) {
 	/*
 		What we want to achieve (in 2D):
@@ -156,7 +171,7 @@ func TestBox_Split(t *testing.T) {
 		|_ _|_ _|
 		|_ _|_ _|
 
-	 */
+	*/
 
 	/*
 		Representation (ignoring the Z axis cause it's hard to draw in 3D ;))
@@ -195,30 +210,29 @@ func TestBox_Split(t *testing.T) {
 		max: 0.5,0.5,0			|		max: 1,0.5,0		|
 		- - - - - - - - - - - - - - - - - - - - - - - - - - |
 		...
-	 */
+	*/
 	b := Box{
-		Min: NewVector3(0, 0, 0),
-		Max: NewVector3(1, 1, 0),
+		Min: vector3.NewVector3(0, 0, 0),
+		Max: vector3.NewVector3(1, 1, 0),
 	}
 	got := b.Split()
-
 
 	/*
 	 *    3____7
 	 *  2/___6/|
 	 *  | 1__|_5
 	 *  0/___4/
-	*/
+	 */
 	want := [8]*Box{
-		{Min: NewVector3(0, 0, 0), Max: NewVector3(0.5, 0.5, 0)}, // A
-		{Min: NewVector3(0, 0, 0), Max: NewVector3(0.5, 0.5, 0)}, // A
-		{Min: NewVector3(0, 0.5, 0), Max: NewVector3(0.5, 1, 0)}, // B
-		{Min: NewVector3(0, 0.5, 0), Max: NewVector3(0.5, 1, 0)}, // B
+		{Min: vector3.NewVector3(0, 0, 0), Max: vector3.NewVector3(0.5, 0.5, 0)}, // A
+		{Min: vector3.NewVector3(0, 0, 0), Max: vector3.NewVector3(0.5, 0.5, 0)}, // A
+		{Min: vector3.NewVector3(0, 0.5, 0), Max: vector3.NewVector3(0.5, 1, 0)}, // B
+		{Min: vector3.NewVector3(0, 0.5, 0), Max: vector3.NewVector3(0.5, 1, 0)}, // B
 
-		{Min: NewVector3(0.5, 0, 0), Max: NewVector3(1, 0.5, 0)}, // C
-		{Min: NewVector3(0.5, 0, 0), Max: NewVector3(1, 0.5, 0)}, // C
-		{Min: NewVector3(0.5, 0.5, 0), Max: NewVector3(1, 1, 0)}, // D
-		{Min: NewVector3(0.5, 0.5, 0), Max: NewVector3(1, 1, 0)}, // D
+		{Min: vector3.NewVector3(0.5, 0, 0), Max: vector3.NewVector3(1, 0.5, 0)}, // C
+		{Min: vector3.NewVector3(0.5, 0, 0), Max: vector3.NewVector3(1, 0.5, 0)}, // C
+		{Min: vector3.NewVector3(0.5, 0.5, 0), Max: vector3.NewVector3(1, 1, 0)}, // D
+		{Min: vector3.NewVector3(0.5, 0.5, 0), Max: vector3.NewVector3(1, 1, 0)}, // D
 	}
 
 	tester := func(got, want [8]*Box) {
@@ -237,6 +251,25 @@ func TestBox_Split(t *testing.T) {
 	tester(got, want)
 }
 
+func bunchOfRandomBoxes(size int) []Box {
+	var boxes []Box
+	for i := 0; i < size; i++ {
+		randomPos := vector3.RandomSpherePoint(*vector3.NewVector3Zero(), float64(size))
+		boxes = append(boxes, *NewBoxOfSize(randomPos.X, randomPos.Y, randomPos.Z, float64(rand.Intn(size))))
+	}
+	return boxes
+}
+func bunchOfRandomVectors(size int) []vector3.Vector3 {
+	var vectors []vector3.Vector3
+	for i := 0; i < size; i++ {
+		vectors = append(vectors, vector3.RandomSpherePoint(*vector3.NewVector3Zero(), float64(size)))
+	}
+	return vectors
+}
+func bunchOfRandomBoxesAndVectors(size int) ([]Box, []vector3.Vector3) {
+	return bunchOfRandomBoxes(size), bunchOfRandomVectors(size)
+}
+
 func BenchmarkArea_NewBoxMinMax(b *testing.B) {
 	size := float64(b.N)
 	b.ResetTimer()
@@ -253,71 +286,49 @@ func BenchmarkArea_NewBoxOfSize(b *testing.B) {
 	}
 }
 
-func BenchmarkArea_In(b *testing.B) {
+func BenchmarkArea_Contains(b *testing.B) {
 	size := float64(b.N)
+	boxes, vectors := bunchOfRandomBoxesAndVectors(int(size))
 	b.ResetTimer()
-	for i := 0.; i < size; i++ {
-		NewVector3(i, i, i).In(*NewBoxOfSize(i, i, i, 1))
+	for i := range boxes {
+		boxes[i].Contains(vectors[i])
 	}
 }
 
 func BenchmarkArea_Fit(b *testing.B) {
 	size := float64(b.N)
+	boxesOne := bunchOfRandomBoxes(int(size))
+	boxesTwo := bunchOfRandomBoxes(int(size))
 	b.ResetTimer()
-	for i := 0.; i < size; i++ {
-		NewBoxOfSize(i, i, i, 0.1).Fit(*NewBoxOfSize(i, i, i, 1))
+	for i := range boxesOne {
+		boxesOne[i].Fit(boxesTwo[i])
 	}
 }
 
 func BenchmarkArea_Intersects(b *testing.B) {
 	size := float64(b.N)
+	boxesOne := bunchOfRandomBoxes(int(size))
+	boxesTwo := bunchOfRandomBoxes(int(size))
 	b.ResetTimer()
-	for i := 0.; i < size; i++ {
-		NewBoxOfSize(i, i, i, 1).Intersects(*NewBoxOfSize(i, i, i, 1))
+	for i := range boxesOne {
+		boxesOne[i].Intersects(boxesTwo[i])
 	}
 }
 
 func BenchmarkArea_Split(b *testing.B) {
 	size := float64(b.N)
+	boxes := bunchOfRandomBoxes(int(size))
 	b.ResetTimer()
-	for i := 0.; i < size; i++ {
-		NewBoxOfSize(i, i, i, 1).Split()
+	for i := range boxes {
+		boxes[i].Split()
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 /** Generated tests **/
 func TestBox_Equal(t *testing.T) {
 	type fields struct {
-		Min                  *Vector3
-		Max                  *Vector3
+		Min *vector3.Vector3
+		Max *vector3.Vector3
 	}
 	type args struct {
 		other Box
@@ -330,27 +341,27 @@ func TestBox_Equal(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			fields:fields{
-				Min: NewVector3(0, 0, 0),
-				Max: NewVector3(1, 1, 1),
+			fields: fields{
+				Min: vector3.NewVector3(0, 0, 0),
+				Max: vector3.NewVector3(1, 1, 1),
 			},
-			args:args{other: *NewBoxMinMax(0, 0, 0, 1, 1, 1)},
+			args: args{other: *NewBoxMinMax(0, 0, 0, 1, 1, 1)},
 			want: true,
 		},
 		{
-			fields:fields{
-				Min: NewVector3(0, 0, 0),
-				Max: NewVector3(1.1, 1, 1),
+			fields: fields{
+				Min: vector3.NewVector3(0, 0, 0),
+				Max: vector3.NewVector3(1.1, 1, 1),
 			},
-			args:args{other: *NewBoxMinMax(0, 0, 0, 1, 1, 1)},
+			args: args{other: *NewBoxMinMax(0, 0, 0, 1, 1, 1)},
 			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := Box{
-				Min:                  tt.fields.Min,
-				Max:                  tt.fields.Max,
+				Min: tt.fields.Min,
+				Max: tt.fields.Max,
 			}
 			if got := b.Equal(tt.args.other); got != tt.want {
 				t.Errorf("Equal() = %v, want %v", got, tt.want)
@@ -361,8 +372,8 @@ func TestBox_Equal(t *testing.T) {
 
 func TestBox_Fit1(t *testing.T) {
 	type fields struct {
-		Min                  *Vector3
-		Max                  *Vector3
+		Min *vector3.Vector3
+		Max *vector3.Vector3
 	}
 	type args struct {
 		o Box
@@ -375,27 +386,27 @@ func TestBox_Fit1(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			fields:fields{
-				Min: NewVector3(0.5, 0.5, 0.5),
-				Max: NewVector3(0.6, 0.6, 0.6),
+			fields: fields{
+				Min: vector3.NewVector3(0.5, 0.5, 0.5),
+				Max: vector3.NewVector3(0.6, 0.6, 0.6),
 			},
-			args:args{o: *NewBoxMinMax(0.5, 0.5, 0.5, 1, 1, 1)},
+			args: args{o: *NewBoxMinMax(0.5, 0.5, 0.5, 1, 1, 1)},
 			want: true,
 		},
 		{
-			fields:fields{
-				Min: NewVector3(5.85, -3.9, 5.2),
-				Max: NewVector3(6.85, -2.9, 6.2),
+			fields: fields{
+				Min: vector3.NewVector3(5.85, -3.9, 5.2),
+				Max: vector3.NewVector3(6.85, -2.9, 6.2),
 			},
-			args:args{o: *NewBoxMinMax(2.92, -1.9, 2.59, 10.3, -4.4, 9.3)},
+			args: args{o: *NewBoxMinMax(2.92, -1.9, 2.59, 10.3, -4.4, 9.3)},
 			want: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := Box{
-				Min:                  tt.fields.Min,
-				Max:                  tt.fields.Max,
+				Min: tt.fields.Min,
+				Max: tt.fields.Max,
 			}
 			if got := b.Fit(tt.args.o); got != tt.want {
 				t.Errorf("Fit() = %v, want %v", got, tt.want)
@@ -406,28 +417,28 @@ func TestBox_Fit1(t *testing.T) {
 
 func TestBox_GetCenter(t *testing.T) {
 	type fields struct {
-		Min                  *Vector3
-		Max                  *Vector3
+		Min *vector3.Vector3
+		Max *vector3.Vector3
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		want   Vector3
+		want   vector3.Vector3
 	}{
 		// TODO: Add test cases.
 		{
-			fields:fields{
-				Min: NewVector3(0.5, 0.5, 0.5),
-				Max: NewVector3(0.6, 0.6, 0.6),
+			fields: fields{
+				Min: vector3.NewVector3(0.5, 0.5, 0.5),
+				Max: vector3.NewVector3(0.6, 0.6, 0.6),
 			},
-			want: *NewVector3(0.55, 0.55, 0.55),
+			want: *vector3.NewVector3(0.55, 0.55, 0.55),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := Box{
-				Min:                  tt.fields.Min,
-				Max:                  tt.fields.Max,
+				Min: tt.fields.Min,
+				Max: tt.fields.Max,
 			}
 			if got := b.GetCenter(); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetCenter() = %v, want %v", got, tt.want)
@@ -438,28 +449,28 @@ func TestBox_GetCenter(t *testing.T) {
 
 func TestBox_GetSize(t *testing.T) {
 	type fields struct {
-		Min                  *Vector3
-		Max                  *Vector3
+		Min *vector3.Vector3
+		Max *vector3.Vector3
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		want   Vector3
+		want   vector3.Vector3
 	}{
 		// TODO: Add test cases.
 		{
-			fields:fields{
-				Min: NewVector3(0.5, 0.5, 0.5),
-				Max: NewVector3(0.6, 0.6, 0.6),
+			fields: fields{
+				Min: vector3.NewVector3(0.5, 0.5, 0.5),
+				Max: vector3.NewVector3(0.6, 0.6, 0.6),
 			},
-			want: *NewVector3(0.1, 0.1, 0.1),
+			want: *vector3.NewVector3(0.1, 0.1, 0.1),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &Box{
-				Min:                  tt.fields.Min,
-				Max:                  tt.fields.Max,
+				Min: tt.fields.Min,
+				Max: tt.fields.Max,
 			}
 			if got := b.GetSize(); !got.Equal(tt.want) {
 				t.Errorf("GetSize() = %v, want %v", got, tt.want)
@@ -470,8 +481,8 @@ func TestBox_GetSize(t *testing.T) {
 
 func TestBox_Intersects1(t *testing.T) {
 	type fields struct {
-		Min                  *Vector3
-		Max                  *Vector3
+		Min *vector3.Vector3
+		Max *vector3.Vector3
 	}
 	type args struct {
 		b2 Box
@@ -484,19 +495,19 @@ func TestBox_Intersects1(t *testing.T) {
 	}{
 		// TODO: Add test cases.
 		{
-			fields:fields{
-				Min: NewVector3(0.5, 0.5, 0.5),
-				Max: NewVector3(0.6, 0.6, 0.6),
+			fields: fields{
+				Min: vector3.NewVector3(0.5, 0.5, 0.5),
+				Max: vector3.NewVector3(0.6, 0.6, 0.6),
 			},
-			args:args{b2: *NewBoxMinMax(0.5, 0.5, 0.5, 1, 1, 1)},
+			args: args{b2: *NewBoxMinMax(0.5, 0.5, 0.5, 1, 1, 1)},
 			want: true,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := Box{
-				Min:                  tt.fields.Min,
-				Max:                  tt.fields.Max,
+				Min: tt.fields.Min,
+				Max: tt.fields.Max,
 			}
 			if got := b.Intersects(tt.args.b2); got != tt.want {
 				t.Errorf("Intersects() = %v, want %v", got, tt.want)
@@ -507,8 +518,8 @@ func TestBox_Intersects1(t *testing.T) {
 
 //func TestBox_Split1(t *testing.T) {
 //	type fields struct {
-//		Min                  *Vector3
-//		Max                  *Vector3
+//		Min                  *vector3.Vector3
+//		Max                  *vector3.Vector3
 //	}
 //	tests := []struct {
 //		name   string
@@ -554,10 +565,10 @@ func TestNewBoxMinMax(t *testing.T) {
 		want *Box
 	}{
 		{
-			args:args{0.5, 0.5, 0.5, 1, 1, 1},
+			args: args{0.5, 0.5, 0.5, 1, 1, 1},
 			want: &Box{
-				Min: NewVector3(0.5, 0.5, 0.5),
-				Max: NewVector3(1, 1, 1),
+				Min: vector3.NewVector3(0.5, 0.5, 0.5),
+				Max: vector3.NewVector3(1, 1, 1),
 			},
 		},
 	}
@@ -598,122 +609,122 @@ func TestNewBoxOfSize(t *testing.T) {
 }
 
 func TestBox_EncapsulateBox(t *testing.T) {
-    type fields struct {
-        Min                  *Vector3
-        Max                  *Vector3
-        XXX_NoUnkeyedLiteral struct{}
-        XXX_unrecognized     []byte
-        XXX_sizecache        int32
-    }
-    type args struct {
-        o Box
-    }
-    tests := []struct {
-        name   string
-        fields fields
-        args   args
-        want   *Box
-    }{
-        // TODO: Add test cases.
-        {
-            fields: fields{
-                Min: &Vector3{
-                    X:                    0,
-                    Y:                    0,
-                    Z:                    0,
-                },
-                Max: &Vector3{
-                    X:                    1,
-                    Y:                    1,
-                    Z:                    1,
-                },
-            },
-            args:args{
-                o: Box{
-                Min: &Vector3{
-                    X:                    1,
-                    Y:                    1,
-                    Z:                    1,
-                },
-                Max: &Vector3{
-                    X:                    2,
-                    Y:                    2,
-                    Z:                    2,
-                },
-            },
-            },
-            want: NewBoxMinMax(0, 0, 0, 2, 2, 2),
-        },
-    }
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-            b := &Box{
-                Min:                  tt.fields.Min,
-                Max:                  tt.fields.Max,
-                XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
-                XXX_unrecognized:     tt.fields.XXX_unrecognized,
-                XXX_sizecache:        tt.fields.XXX_sizecache,
-            }
-            if got := b.EncapsulateBox(tt.args.o); !reflect.DeepEqual(got, tt.want) {
-                t.Errorf("EncapsulateBox() = %v, want %v", got, tt.want)
-            }
-        })
-    }
+	type fields struct {
+		Min                  *vector3.Vector3
+		Max                  *vector3.Vector3
+		XXX_NoUnkeyedLiteral struct{}
+		XXX_unrecognized     []byte
+		XXX_sizecache        int32
+	}
+	type args struct {
+		o Box
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *Box
+	}{
+		// TODO: Add test cases.
+		{
+			fields: fields{
+				Min: &vector3.Vector3{
+					X: 0,
+					Y: 0,
+					Z: 0,
+				},
+				Max: &vector3.Vector3{
+					X: 1,
+					Y: 1,
+					Z: 1,
+				},
+			},
+			args: args{
+				o: Box{
+					Min: &vector3.Vector3{
+						X: 1,
+						Y: 1,
+						Z: 1,
+					},
+					Max: &vector3.Vector3{
+						X: 2,
+						Y: 2,
+						Z: 2,
+					},
+				},
+			},
+			want: NewBoxMinMax(0, 0, 0, 2, 2, 2),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &Box{
+				Min:                  tt.fields.Min,
+				Max:                  tt.fields.Max,
+				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
+				XXX_unrecognized:     tt.fields.XXX_unrecognized,
+				XXX_sizecache:        tt.fields.XXX_sizecache,
+			}
+			if got := b.EncapsulateBox(tt.args.o); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("EncapsulateBox() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }
 
 func TestBox_EncapsulatePoint(t *testing.T) {
-    type fields struct {
-        Min                  *Vector3
-        Max                  *Vector3
-        XXX_NoUnkeyedLiteral struct{}
-        XXX_unrecognized     []byte
-        XXX_sizecache        int32
-    }
-    type args struct {
-        o Vector3
-    }
-    tests := []struct {
-        name   string
-        fields fields
-        args   args
-        want   *Box
-    }{
-        // TODO: Add test cases.
-        {
-            fields: fields{
-                Min: &Vector3{
-                    X:                    0,
-                    Y:                    0,
-                    Z:                    0,
-                },
-                Max: &Vector3{
-                    X:                    1,
-                    Y:                    1,
-                    Z:                    1,
-                },
-            },
-            args:args{
-                o: Vector3{
-                        X:                    2,
-                        Y:                    2,
-                        Z:                    2,
-                    },
-            },
-            want: NewBoxMinMax(0, 0, 0, 2, 2, 2),
-        },
-    }
-    for _, tt := range tests {
-        t.Run(tt.name, func(t *testing.T) {
-            b := &Box{
-                Min:                  tt.fields.Min,
-                Max:                  tt.fields.Max,
-                XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
-                XXX_unrecognized:     tt.fields.XXX_unrecognized,
-                XXX_sizecache:        tt.fields.XXX_sizecache,
-            }
-            if got := b.EncapsulatePoint(tt.args.o); !reflect.DeepEqual(got, tt.want) {
-                t.Errorf("EncapsulatePoint() = %v, want %v", got, tt.want)
-            }
-        })
-    }
+	type fields struct {
+		Min                  *vector3.Vector3
+		Max                  *vector3.Vector3
+		XXX_NoUnkeyedLiteral struct{}
+		XXX_unrecognized     []byte
+		XXX_sizecache        int32
+	}
+	type args struct {
+		o vector3.Vector3
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   *Box
+	}{
+		// TODO: Add test cases.
+		{
+			fields: fields{
+				Min: &vector3.Vector3{
+					X: 0,
+					Y: 0,
+					Z: 0,
+				},
+				Max: &vector3.Vector3{
+					X: 1,
+					Y: 1,
+					Z: 1,
+				},
+			},
+			args: args{
+				o: vector3.Vector3{
+					X: 2,
+					Y: 2,
+					Z: 2,
+				},
+			},
+			want: NewBoxMinMax(0, 0, 0, 2, 2, 2),
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &Box{
+				Min:                  tt.fields.Min,
+				Max:                  tt.fields.Max,
+				XXX_NoUnkeyedLiteral: tt.fields.XXX_NoUnkeyedLiteral,
+				XXX_unrecognized:     tt.fields.XXX_unrecognized,
+				XXX_sizecache:        tt.fields.XXX_sizecache,
+			}
+			if got := b.EncapsulatePoint(tt.args.o); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("EncapsulatePoint() = %v, want %v", got, tt.want)
+			}
+		})
+	}
 }

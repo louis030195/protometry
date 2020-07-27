@@ -1,9 +1,9 @@
-package protometry
+package volume
 
 import (
-    "github.com/louis030195/protometry/internal/utils"
-    "math/rand"
-    "testing"
+	"github.com/louis030195/protometry/internal/utils"
+	"math/rand"
+	"testing"
 )
 
 func TestMesh_Mutate(t *testing.T) {

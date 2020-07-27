@@ -1,9 +1,10 @@
-package protometry
+package vector3
 
 import (
     "github.com/louis030195/protometry/internal/utils"
-    "reflect"
-    "testing"
+    "math"
+	"reflect"
+	"testing"
 )
 
 func TestVector3_Lerp(t *testing.T) {
@@ -134,29 +135,6 @@ func TestMin(t *testing.T) {
 	}
 }
 
-func TestVector3_In(t *testing.T) {
-	a := NewBoxOfSize(0.5, 0.5, 0.5, 1)
-	utils.Equals(t, true, NewVector3(1, 1, 1).In(*a))
-
-	utils.Equals(t, true, NewVector3(0, 0, 0).In(*a))
-
-	utils.Equals(t, true, NewVector3(1, 0, 0).In(*a))
-
-	utils.Equals(t, true, NewVector3(0, 0, 1).In(*a))
-
-	utils.Equals(t, true, NewVector3(0.5, 0.5, 0.5).In(*a))
-
-	utils.Equals(t, false, NewVector3(-0.000001, 0.5, 0.5).In(*a))
-
-	utils.Equals(t, false, NewVector3(0.5, -0.000001, 0.5).In(*a))
-
-	utils.Equals(t, false, NewVector3(0.5, 0.5, -0.000001).In(*a))
-
-	utils.Equals(t, false, NewVector3(0.5, 1.000001, 0.5).In(*a))
-
-	utils.Equals(t, false, NewVector3(0.5, 0.5, 1.000001).In(*a))
-}
-
 func TestVector3_Clone(t *testing.T) {
 	a := NewVector3(12, 4, 6)
 	b := a.Clone()
@@ -227,9 +205,6 @@ func TestVector3_Plus(t *testing.T) {
 	utils.Equals(t, true, c.Equal(*NewVector3(0, 0, 0)))
 }
 
-
-
-
 func BenchmarkVector_Plus(b *testing.B) {
 	var vectors []Vector3
 	for i := 0; i < b.N; i++ {
@@ -274,3 +249,20 @@ func BenchmarkVector_Subtract(b *testing.B) {
 	}
 }
 
+func TestNewVector3Max(t *testing.T) {
+	v := Vector3{
+		X: math.MaxFloat64,
+		Y: math.MaxFloat64,
+		Z: math.MaxFloat64,
+	}
+	utils.Equals(t, true, v.Equal(*NewVector3Max()) == true)
+}
+
+func TestNewVector3Min(t *testing.T) {
+	v := Vector3{
+		X: -math.MaxFloat64,
+		Y: -math.MaxFloat64,
+		Z: -math.MaxFloat64,
+	}
+	utils.Equals(t, true, v.Equal(*NewVector3Min()) == true)
+}

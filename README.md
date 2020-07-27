@@ -2,6 +2,7 @@
 # protometry
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/52ed0a7a050c470ababeb6e888d51878)](https://app.codacy.com/gh/louis030195/protometry?utm_source=github.com&utm_medium=referral&utm_content=louis030195/protometry&utm_campaign=Badge_Grade_Dashboard)
+[![PkgGoDev](https://pkg.go.dev/badge/louis030195/protometry)](https://pkg.go.dev/louis030195/protometry)
 
 Geometry on protobuf stubs, could be also implemented in other languages.
 
@@ -18,17 +19,28 @@ go get github.com/louis030195/protometry
 ## Usage
 
 ```go
-vector := NewVector3One() // 1,1,1
-log.Printf("My vector: %s", vector.Get(1)) // 1
-vector.Set(0, 12.6422)
+package main
 
-v := NewVector3(0, 0, 0)
-v.Scale(3.5) // 0,0,0
-v.Plus(v) // 0,0,0
+import (
+    "github.com/louis030195/protometry/api/vector3"
+    "github.com/louis030195/protometry/api/volume"
+    "log"
+)
 
-a := NewBoxMinMax(*NewVector3(0, 0, 0), *NewVector3(1, 1, 1))
-b := NewBoxOfSize(*NewVector3(2, 2, 2), 0.5)
-a.Fit(*b) // False
+func main() {
+    vector := vector3.NewVector3One()     // 1,1,1
+    log.Printf("My vector: %f", vector.X) // 1
+    vector.X = 12.6422
+
+    v := vector3.NewVector3(0, 0, 0)
+    v.Scale(3.5) // 0,0,0
+    v2 := v.Plus(*v) // 0,0,0
+    log.Printf("My vector: %v", v2) // 0,0,0
+
+    a := volume.NewBoxMinMax(0, 0, 0, 1, 1, 1)
+    b := volume.NewBoxOfSize(2, 2, 2, 0.5)
+    a.Fit(*b) // False
+}
 ```
 
 ## Features
@@ -48,13 +60,13 @@ a.Fit(*b) // False
 ## Test
 
 ```bash
-go test -v
+make test
 ```
 
 ## Benchmarks
 
 ```bash
-go test -benchmem -run XXX -bench . -benchtime 100000x # or -benchtime 0.02s
+make bench
 ```
 
 ![bench](docs/bench.png)

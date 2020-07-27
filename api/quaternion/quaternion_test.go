@@ -1,7 +1,7 @@
-package protometry
+package quaternion
 
 import (
-    "reflect"
+	"reflect"
 	"testing"
 )
 
