@@ -2,7 +2,7 @@
 # protometry
 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/52ed0a7a050c470ababeb6e888d51878)](https://app.codacy.com/gh/louis030195/protometry?utm_source=github.com&utm_medium=referral&utm_content=louis030195/protometry&utm_campaign=Badge_Grade_Dashboard)
-[![PkgGoDev](https://pkg.go.dev/badge/louis030195/protometry)](https://pkg.go.dev/louis030195/protometry)
+[![PkgGoDev](https://pkg.go.dev/badge/louis030195/protometry)](https://pkg.go.dev/github.com/louis030195/protometry)
 
 Geometry on protobuf stubs, could be also implemented in other languages.
 
