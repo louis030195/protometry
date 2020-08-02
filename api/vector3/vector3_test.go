@@ -266,3 +266,54 @@ func TestNewVector3Min(t *testing.T) {
 	}
 	utils.Equals(t, true, v.Equal(*NewVector3Min()) == true)
 }
+
+func TestVector3_Equal(t *testing.T) {
+    type fields struct {
+        X                    float64
+        Y                    float64
+        Z                    float64
+    }
+    type args struct {
+        v2 Vector3
+    }
+    tests := []struct {
+        name   string
+        fields fields
+        args   args
+        want   bool
+    }{
+        // TODO: Add test cases.
+        {
+            name: "Too different",
+            fields: fields{
+                X: 1,
+                Y: 1,
+                Z: 1,
+            },
+            args: args{v2: *NewVector3(0.9, 0.9, 0.9)},
+            want: false,
+        },
+        {
+            name: "Epsilon-prone",
+            fields: fields{
+                X: 1,
+                Y: 1,
+                Z: 1,
+            },
+            args: args{v2: *NewVector3(1-1e-17, 1-1e-17, 1-1e-17)},
+            want: true,
+        },
+    }
+    for _, tt := range tests {
+        t.Run(tt.name, func(t *testing.T) {
+            v := Vector3{
+                X:                    tt.fields.X,
+                Y:                    tt.fields.Y,
+                Z:                    tt.fields.Z,
+            }
+            if got := v.Equal(tt.args.v2); got != tt.want {
+                t.Errorf("Equal() = %v, want %v", got, tt.want)
+            }
+        })
+    }
+}
